@@ -33,10 +33,10 @@ if __name__=="__main__":
             axis = 0
             output = f"{args.output_path}T{timestep}-X{index}-S{size}-A{axis}"
             print(timestep, index, size, axis)
-            #process = Popen(["python", "getChannelSliceMultiprocessing.py", f"{timestep}", f"{index}", f"{output}",
-            #                 "-s", f"{size}", "-a", f"{axis}", "--num-processors", f"{args.num_processors}"])
-            #code = process.wait()
-            code = 0
+            process = Popen(["python", "getChannelSliceMultiprocessing.py", f"{timestep}", f"{index}", f"{output}",
+                             "-s", f"{size}", "-a", f"{axis}", "--num-processors", f"{args.num_processors}"])
+            code = process.wait()
+            #code = 0
             if code == 0:
                 try:
                     f = h5py.File(output+".h5", "r")
