@@ -8,7 +8,6 @@ from pathlib import Path
 def setParams(timestep, index, axis, size):
     start = np.array((1, 1, 1, timestep), dtype=int)
     end = np.array((2048, 512, 1536, timestep), dtype=int)
-    #end = np.array((32, 33, 32, timestep), dtype=int)
     step = np.ones(4, dtype=int)
     upperBound = np.array((2048, 512, 1536, 4000), dtype=int)
     start[axis] = index
@@ -28,7 +27,6 @@ def queryData(i, args, startPoint, size, function):
     temp = lJHTDB.getCutout(
                     data_set="channel", field=function, time_step=startArr[3],
                     start=startArr[:3], end=endArr[:3], step=stepArr[:3])
-    #print(size, temp.shape[2-args.axis])
     if temp.shape[2-args.axis] != size:
         print("Error. Queried array is of wrong shape: ", temp.shape)
         exit(1)
@@ -60,12 +58,7 @@ if __name__ == "__main__":
         authToken = f.read()
     print(authToken.strip())
 
-    #startArr, endArr, stepArr = setParams(args.timestep, args.index, args.axis, args.size)
     function = "p" if args.pressure else "u"
-    #print(startArr)
-    #print(endArr)
-    #print(stepArr)
-    #print(function)
     numProcessors = args.num_processors
     if numProcessors < 0 or numProcessors > mp.cpu_count():
         numProcessors = mp.cpu_count()
@@ -78,27 +71,19 @@ if __name__ == "__main__":
     lJHTDB.lib.turblibSetExitOnError(ctypes.c_int(0));
     lJHTDB.add_token(authToken.strip())
 
-    ## "filename" parameter is the file names of output files, if filename='N/A', no files will be written. 
-    ##             For example, if filename='results', the function will write "results.h5" and "results.xmf".
-    ## The function only returns the data at the last time step within [t_start:t_step:t_end]
-    ## The function only returns the data in the last field. For example, result=p if field=[up].
-    #result = lJHTDB.getbigCutout(
-    #        data_set="channel", fields=function, filename=args.output,
-    #        t_start=startArr[3], t_end=endArr[3], t_step=stepArr[3],
-    #        start=startArr[:3], end=endArr[:3], step=stepArr[:3])
     Path("temp").mkdir(parents=True, exist_ok=True)
     processes = []
     startPoint = args.index
     for i in range((args.size//perProcess)):
-        queryData(i, args, startPoint, 5, function)
         processes.append(mp.Process(target=queryData, args=(i, args, startPoint, perProcess, function)))
         startPoint += perProcess
     if (args.size % perProcess) != 0:
-        queryData("Last", args, startPoint, args.size-((args.size//5)*5), function)
         processes.append(mp.Process(target=queryData, args=("Last", args, startPoint, args.size-((args.size//perProcess)*perProcess), function)))
     for p in processes:
+        print(f"Starting process {p}")
         p.start()
     for p in processes:
+        print(f"Joining process {p}")
         p.join()
     lJHTDB.finalize()
 
@@ -140,7 +125,6 @@ if __name__ == "__main__":
     lJHTDB.hdf5_writing(args.output,resultArr,"channel",VarName,dim,args.timestep,hdf5_file,xdmf_file,shape)
     print(f"    </Grid>{nl}", file=xdmf_file)
     lJHTDB.hdf5_end(hdf5_file,xdmf_file)
-    #print(result.shape)
     exit(0)
 
     
