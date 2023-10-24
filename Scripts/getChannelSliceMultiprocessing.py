@@ -90,11 +90,11 @@ if __name__ == "__main__":
     processes = []
     startPoint = args.index
     for i in range((args.size//perProcess)):
-        #queryData(i, args, startPoint, 5, function)
+        queryData(i, args, startPoint, 5, function)
         processes.append(mp.Process(target=queryData, args=(i, args, startPoint, perProcess, function)))
         startPoint += perProcess
     if (args.size % perProcess) != 0:
-        #queryData("Last", args, startPoint, args.size-((args.size//5)*5), function)
+        queryData("Last", args, startPoint, args.size-((args.size//5)*5), function)
         processes.append(mp.Process(target=queryData, args=("Last", args, startPoint, args.size-((args.size//perProcess)*perProcess), function)))
     for p in processes:
         p.start()
