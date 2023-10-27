@@ -80,10 +80,10 @@ if __name__ == "__main__":
     if (args.size % perProcess) != 0:
         processes.append(mp.Process(target=queryData, args=("Last", args, startPoint, args.size-((args.size//perProcess)*perProcess), function)))
     for p in processes:
-        print(f"Starting process {p}")
+        #print(f"Starting process {p}")
         p.start()
     for p in processes:
-        print(f"Joining process {p}")
+        #print(f"Joining process {p}")
         p.join()
     lJHTDB.finalize()
 

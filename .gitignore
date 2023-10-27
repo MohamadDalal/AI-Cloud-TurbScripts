@@ -2,3 +2,5 @@ authToken.txt
 *.h5
 *.xmf
 *.npy
+*.log
+checkIntegrity.py
