@@ -1,10 +1,34 @@
 import h5py
+from sys import stdout
 import numpy as np
 import os
 import matplotlib.pyplot as plt
 
 
+def progress_bar(iteration:int, total:int, bar_length=50):
+    '''
+    Track progress of a loop.
+
+    :iteration: Current iteration
+    :total: Total iteration
+    :bar_length: Length of a loading bar
+    '''
+    progress = iteration / total
+    arrow = '=' * int(round(bar_length * progress))
+    spaces = ' ' * (bar_length - len(arrow))
+    percent = int(progress * 100)
+    stdout.write(f'[{arrow}{spaces}] {percent}%\r')
+    stdout.flush()
+
+
 def max_pool_3d(method, input_array, pool_size=(3, 3, 3)):
+    '''
+    3D pooling operation on a given 3D array.
+
+    :method: Numpy method for pooling (np.mean, np.median, np.max, np.min,...)
+    :input_array: Input 3D array
+    :pool_size: Size of a pooling filter
+    '''
     x, y, z = input_array.shape
     pool_x, pool_y, pool_z = pool_size
 
@@ -29,87 +53,41 @@ def max_pool_3d(method, input_array, pool_size=(3, 3, 3)):
     return pooled_array
 
 
-# cwd = os.getcwd()
-# cube_dir = os.path.join(cwd, "data", "FullCube_TimeIndex2000")
-# slice_list = os.listdir(cube_dir)
-# slice_list.sort()
-# cube = [np.load(f"{cube_dir}/{slice_list[i]}", mmap_mode="r") for i in range(1)]
+def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3)):
+    '''
+    3D pooling operation on a given 3D array.
+    
+    :input_dir: Input directory of 3D arrays
+    :output_dir: Destination directory of pooled 3D arrays
+    :method: Numpy method for pooling (np.mean, np.median, np.max, np.min,...)
+    :pool_size: Size of a pooling filter
+    '''
+    all_file_list = os.listdir(input_dir)
+    file_list_h5 = [x for x in all_file_list if x.split(".")[-1] == "h5"]
+    data = [h5py.File(f"{input_dir}/{x}") for x in file_list_h5]
 
-# input_array = cube[0]
-# input_array = np.mean(input_array, axis=3)
+    for i, x in enumerate(file_list_h5):
+        input_array = np.mean(data[i][tuple(data[i].keys())[0]], axis=3)
+        pooled_array = max_pool_3d(method, input_array, pool_size)
 
-# pool_size = (32, 32, 32)
-# pooled_array = max_pool_3d(np.max, input_array, pool_size)
-# print("Input shape:", input_array.shape)
-# print("Pooled shape:", pooled_array.shape)
+        np.save(f"{output_dir}/{x[:-3]}", pooled_array)
+        progress_bar(i+1, len(file_list_h5))
 
-# fig, axes = plt.subplots(1,2)
-# axes[0].imshow(pooled_array[:,pooled_array.shape[1]//2,:], vmin=0, vmax=np.max(input_array))
-# axes[1].imshow(input_array[:,64,:], vmin=0, vmax=np.max(input_array))
-# fig.savefig("3dpool.png")
+    return None
+
 
 work_dir = os.getcwd()
 data_dir = os.path.join(work_dir, "data")
 
-#-------------------------------------------------#
-# # POOLING dataSent
-# channel_dir = os.path.join(data_dir, "dataSent")
-# pooled_dir = os.path.join(data_dir, "dataSent_Pooled")
-# file_list = os.listdir(channel_dir)
-# file_list = [x for x in file_list if x[-1]=="5"]
-# data = [h5py.File(f"{channel_dir}/{x}") for x in file_list if x[-1] == "5"]
+dataSent = os.path.join(data_dir, "dataSent")
+dataSent_Pooled = os.path.join(data_dir, "dataSent_Pooled")
 
-# print("\n",list(data[0].keys()))
-# print(data[0][tuple(data[0].keys())[0]])
+FChannel = os.path.join(data_dir, "2000_Full_Channel")
+FChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 
-# for i, x in enumerate(file_list):
-#     print(i,x)
-#     input_array = np.mean(data[i][tuple(data[i].keys())[0]], axis=3)
-#     print(input_array.shape)
-#     pooled_array = max_pool_3d(np.max, input_array)
-#     print(pooled_array.shape)
-#     np.save(f"{pooled_dir}/{x}", pooled_array)
-# print("Done")
+batch_pool(input_dir=FChannel, output_dir=FChannel_Pooled, method=np.mean, pool_size=(3,3,3))
 
 #-------------------------------------------------#
-# # POOLING channelData
-# channel_dir = os.path.join(data_dir, "channelData")
-# pooled_dir = os.path.join(data_dir, "channelData_Pooled")
-# file_list = os.listdir(channel_dir)
-
-# data = [h5py.File(f"{channel_dir}/{x}") for x in file_list]
-
-# print("\n",list(data[0].keys()))
-# print(data[0][tuple(data[0].keys())[0]])
-
-# for i, x in enumerate(file_list):
-#     print(i,x)
-#     input_array = np.mean(data[i][tuple(data[i].keys())[0]], axis=3)
-#     print(input_array.shape)
-#     pooled_array = max_pool_3d(np.max, input_array)
-#     print(pooled_array.shape)
-#     np.save(f"{pooled_dir}/{x}", pooled_array)
-# print("Done")
-
-#-------------------------------------------------#
-# # POOLING 2000_Full_Channel
-# channel_dir = os.path.join(data_dir, "2000_Full_Channel")
-# pooled_dir = os.path.join(data_dir, "2000_Full_Channel_Pooled")
-
-# data = [h5py.File(f"{channel_dir}/2000_Full_Channel{x}.h5") for x in range(1, 17)]
-
-# # print("\n",list(data[0].keys()))
-# # print(data[0][tuple(data[0].keys())[0]])
-
-# for x in range(16):
-
-#     input_array = np.mean(data[x][tuple(data[x].keys())[0]], axis=3)
-#     print(input_array.shape)
-#     pooled_array = max_pool_3d(np.max, input_array)
-#     print(pooled_array.shape)
-#     np.save(f"{pooled_dir}/2000_Full_Channel{x + 1}.npy", pooled_array)
-
-#----------------------------------------------#
 # # 3D VISUALIZATION
 # input_array = np.mean(data[0][tuple(data[0].keys())[0]], axis=3)
 # print(input_array.shape)
@@ -128,15 +106,3 @@ data_dir = os.path.join(work_dir, "data")
 # axes[0].imshow(pooled_array[:,:,pooled_array.shape[2]//2], vmin=0, vmax=np.max(input_array))
 # axes[1].imshow(input_array[:,:,16], vmin=0, vmax=np.max(input_array))
 # fig.savefig("3dpool.png")
-
-#----------------------------------------------#
-# TORCH - not working, didn't bother
-# input_array = np.mean(input_array, axis=3)
-# input_torch = torch.from_numpy(input_array)
-
-# pool = torch.nn.MaxPool3d(4, 1, dilation=1)
-# out = pool(input_torch)
-# fig, axes = plt.subplots(1,2)
-# axes[0].imshow(out[:,16,:,:])
-# axes[1].imshow(input_array[:,64,:,:])
-# fig.savefig("yoloTorch")
