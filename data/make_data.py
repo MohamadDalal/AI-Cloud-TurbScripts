@@ -77,7 +77,7 @@ def sort_imgs(*args):
 
     :param args: A tuple of directory paths.
     The first element is the directory containing original 3D data,
-    and the second element is the directory of 2D pooled images.
+    and the second element is the directory of 2D pooled images (saved from get_2d_bulk).
     '''
     all_data_dir = os.path.join(os.getcwd(), "data", "all_data")
     for dataset in args:
