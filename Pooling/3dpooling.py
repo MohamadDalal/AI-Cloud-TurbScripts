@@ -53,7 +53,7 @@ def max_pool_3d(method, input_array, pool_size=(3, 3, 3)):
     return pooled_array
 
 
-def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3)):
+def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=True):
     '''
     3D pooling operation on a given 3D array.
     
@@ -71,7 +71,8 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3)):
         pooled_array = max_pool_3d(method, input_array, pool_size)
 
         np.save(f"{output_dir}/{x[:-3]}", pooled_array)
-        progress_bar(i+1, len(file_list_h5))
+        if loading_bar:
+            progress_bar(i+1, len(file_list_h5))
 
     return None
 
