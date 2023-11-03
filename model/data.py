@@ -4,6 +4,24 @@ from torchvision.transforms import Compose, CenterCrop, ToTensor, Resize
 from dataset import DatasetFromFolder
 
 
+'''
+# Directory layout #
+
+data
+├── all_data
+    ├── label
+    └── train
+├── 2000_Full_Channel
+├── 2000_Full_Channel_Img
+├── 2000_Full_Channel_Pooled
+├── channelData
+├── channelData_Img
+├── channelData_Pooled
+├── dataSent
+├── dataSent_Img
+├── dataSent_Pooled
+'''
+
 def input_transform():
     return Compose([
         ToTensor(),
