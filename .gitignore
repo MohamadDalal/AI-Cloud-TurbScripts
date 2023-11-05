@@ -4,3 +4,4 @@ authToken.txt
 *.npy
 *.log
 checkIntegrity.py
+__pycache__

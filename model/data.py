@@ -9,8 +9,12 @@ from dataset import DatasetFromFolder
 
 data
 ├── all_data
-    ├── label
     └── train
+        ├── data
+        └── labels
+    └── test
+        ├── data
+        └── labels
 ├── 2000_Full_Channel
 ├── 2000_Full_Channel_Img
 ├── 2000_Full_Channel_Pooled

@@ -1,7 +1,7 @@
 import torch.utils.data as data
 
 from os import listdir
-from os.path import join
+from os.path import join, exists
 import numpy as np
 
 
@@ -16,13 +16,23 @@ def load_array(filepath):
 class DatasetFromFolder(data.Dataset):
     def __init__(self, image_dir, input_transform=None, target_transform=None):
         super(DatasetFromFolder, self).__init__()
-        self.image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_array_file(x)]
-
+        #self.image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_array_file(x)]
+        self.data_dir = join(image_dir, "data")
+        self.label_dir = join(image_dir, "labels")
+        self.image_filenames = [x for x in listdir(self.data_dir) if is_array_file(x)]  
+        index = 0      
+        while index < len(self.image_filenames):
+            if exists(join(self.label_dir, self.image_filenames[index])):
+                index += 1
+            else:
+                print(f'No label array exists for slice {self.image_filenames[index]}')
+                self.image_filenames.pop(index)
         self.input_transform = input_transform
         self.target_transform = target_transform
 
     def __getitem__(self, index):
-        input = load_array(self.image_filenames[index])
+        input = load_array(join(self.data_dir, self.image_filenames[index]))
+        target = load_array(join(self.label_dir, self.image_filenames[index]))
         if self.input_transform:
             input = self.input_transform(input)
         if self.target_transform:
