@@ -14,14 +14,18 @@ def load_array(filepath):
 
 
 class DatasetFromFolder(data.Dataset):
-    def __init__(self, image_dir, input_transform=None, target_transform=None):
+    def __init__(self, image_dir, input_transform=None, target_transform=None, image_filenames=None):
         super(DatasetFromFolder, self).__init__()
         #self.image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_array_file(x)]
         self.data_dir = join(image_dir, "data")
         self.label_dir = join(image_dir, "labels")
-        self.image_filenames = [x for x in listdir(self.data_dir) if is_array_file(x)]  
+        if image_filenames is None:
+            self.image_filenames = [x for x in listdir(self.data_dir) if is_array_file(x)]
+        else:
+            self.image_filenames = [x for x in image_filenames if is_array_file(x)]
+          
         index = 0      
-        while index < len(self.image_filenames):
+        for _ in range(len(self.image_filenames)):
             if exists(join(self.label_dir, self.image_filenames[index])):
                 index += 1
             else:
