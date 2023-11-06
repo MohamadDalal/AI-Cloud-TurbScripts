@@ -29,12 +29,14 @@ data
 def input_transform():
     return Compose([
         ToTensor(),
+        Resize((49,16), antialias=True),
     ])
 
 
 def target_transform():
     return Compose([
         ToTensor(),
+        Resize((1568,512), antialias=True),
     ])
 
 

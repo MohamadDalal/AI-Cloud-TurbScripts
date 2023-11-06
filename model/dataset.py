@@ -20,7 +20,7 @@ class DatasetFromFolder(data.Dataset):
         self.data_dir = join(image_dir, "data")
         self.label_dir = join(image_dir, "labels")
         if image_filenames is None:
-            self.image_filenames = [x for x in listdir(self.data_dir) if is_array_file(x)]
+            self.image_filenames = [x for x in sorted(listdir(self.data_dir)) if is_array_file(x)]
         else:
             self.image_filenames = [x for x in image_filenames if is_array_file(x)]
           
@@ -36,7 +36,9 @@ class DatasetFromFolder(data.Dataset):
 
     def __getitem__(self, index):
         input = load_array(join(self.data_dir, self.image_filenames[index]))
+        input = np.float32(input)
         target = load_array(join(self.label_dir, self.image_filenames[index]))
+        target = np.float32(np.mean(target, axis=2))
         if self.input_transform:
             input = self.input_transform(input)
         if self.target_transform:

@@ -53,14 +53,17 @@ BATCH_SIZE = 64
 EPOCHS = 2
 
 print('===> Loading datasets')
-train_set = join(getcwd(), "data", "all_data", "train")
-test_set = join(getcwd(), "data", "all_data", "label")
+train_set_dir = join(getcwd(), "data", "all_data", "train")
+test_set_dir = join(getcwd(), "data", "all_data", "test")
 
-training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=True)
+train_set = get_training_set()
+test_set = get_test_set()
+
+training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 print('===> Building model')
-model = Net(upscale_factor=4).to(device)
+model = Net(upscale_factor=32).to(device)
 criterion = nn.MSELoss()
 
 optimizer = optim.Adam(model.parameters(), lr=0.01)
