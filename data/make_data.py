@@ -3,14 +3,15 @@ import numpy as np
 from h5py import File
 from sys import stdout
 
-
 '''
-# Directory layout #
-
 data
 ├── all_data
-    ├── label
     └── train
+        ├── data
+        └── labels
+    └── test
+        ├── data
+        └── labels
 ├── 2000_Full_Channel
 ├── 2000_Full_Channel_Img
 ├── 2000_Full_Channel_Pooled

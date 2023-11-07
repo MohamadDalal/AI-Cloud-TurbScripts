@@ -61,14 +61,19 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
     :output_dir: Destination directory of pooled 3D arrays
     :method: Numpy method for pooling (np.mean, np.median, np.max, np.min,...)
     :pool_size: Size of a pooling filter
+    :loading_bar: Display loading bar in terminal
     '''
     all_file_list = os.listdir(input_dir)
     file_list_h5 = [x for x in all_file_list if x.split(".")[-1] == "h5"]
     data = [h5py.File(f"{input_dir}/{x}") for x in file_list_h5]
 
     for i, x in enumerate(file_list_h5):
-        input_array = np.mean(data[i][tuple(data[i].keys())[0]], axis=3)
-        pooled_array = max_pool_3d(method, input_array, pool_size)
+        channels = []
+        input_array = data[i][tuple(data[i].keys())[0]]
+        for j in range(input_array.shape[-1]):
+            pooled_channel = max_pool_3d(method, input_array[...,j], pool_size) 
+            channels.append(pooled_channel[..., np.newaxis])
+        pooled_array = np.concatenate(channels, axis=3)
 
         np.save(f"{output_dir}/{x[:-3]}", pooled_array)
         if loading_bar:
@@ -80,13 +85,17 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
 work_dir = os.getcwd()
 data_dir = os.path.join(work_dir, "data")
 
-dataSent = os.path.join(data_dir, "dataSent")
-dataSent_Pooled = os.path.join(data_dir, "dataSent_Pooled")
+dSent = os.path.join(data_dir, "dataSent")
+dSent_Pooled = os.path.join(data_dir, "dataSent_Pooled")
 
-FChannel = os.path.join(data_dir, "2000_Full_Channel")
-FChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
+cData = os.path.join(data_dir, "channelData")
+cData_Pooled = os.path.join(data_dir, "channelData_Pooled")
 
-batch_pool(input_dir=FChannel, output_dir=FChannel_Pooled, method=np.mean, pool_size=(3,3,3))
+fChannel = os.path.join(data_dir, "2000_Full_Channel")
+fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
+
+
+batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
 
 #-------------------------------------------------#
 # # 3D VISUALIZATION
