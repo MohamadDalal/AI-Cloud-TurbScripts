@@ -49,9 +49,9 @@ def load_data(folder_name):
     :return: Tuple where the first element is filenames,
     and the second element is the corresponding data. 
     '''
-    filenames = os.listdir(folder_name)
+    filenames = sorted(os.listdir(folder_name))
     data = [np.load(f"{folder_name}/{file}") for file in filenames]
-    return tuple(filenames, data)
+    return (filenames, data)
 
 
 def get_2d_bulk(*args):
@@ -91,9 +91,10 @@ def sort_imgs(*args):
             load_imgs = [np.load(f"{img_data}/{x}") for x in sorted(os.listdir(img_data)) if x.split(".")[0][:-1] == chunk.split(".")[0]]
             for i in range(len(load_imgs)):
                 i_original = 3*i + 1
-                np.save(f"{all_data_dir}/label/{chunk[:-3]}{i}.npy",chunk_data[:,:,i_original,:])
-                np.save(f"{all_data_dir}/train/{chunk[:-3]}{i}.npy", load_imgs[i])
-    
+                # Train-test split afterwards from here
+                np.save(f"{all_data_dir}/gt/{chunk[:-3]}{i}.npy",chunk_data[:,:,i_original,:])
+                np.save(f"{all_data_dir}/train_equivalent/{chunk[:-3]}{i}.npy", load_imgs[i])
+
 
 pwd = os.getcwd()
 data_dir = os.path.join(pwd, "data")
@@ -110,6 +111,5 @@ Full_Channel = os.path.join(data_dir, "2000_Full_Channel")
 Full_ChannelPooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 Full_ChannelImg = os.path.join(data_dir, "2000_Full_Channel_Img")
 
-
-get_2d_bulk((Full_ChannelPooled, Full_ChannelImg))
+get_2d_bulk((dataSentPooled, dataSentImg), (channelDataPooled, channelDataImg))
 sort_imgs((dataSent, dataSentImg), (channelData, channelDataImg))

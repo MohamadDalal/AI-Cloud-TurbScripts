@@ -74,7 +74,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
             pooled_channel = max_pool_3d(method, input_array[...,j], pool_size) 
             channels.append(pooled_channel[..., np.newaxis])
         pooled_array = np.concatenate(channels, axis=3)
-
+        print(f"{output_dir}/{x[:-3]}")
         np.save(f"{output_dir}/{x[:-3]}", pooled_array)
         if loading_bar:
             progress_bar(i+1, len(file_list_h5))
@@ -95,7 +95,9 @@ fChannel = os.path.join(data_dir, "2000_Full_Channel")
 fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 
 
-batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
+# batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
+batch_pool(input_dir=dSent, output_dir=dSent_Pooled, method=np.mean, pool_size=(31,31,3))
+# batch_pool(input_dir=cData, output_dir=cData_Pooled, method=np.mean, pool_size=(31,31,3))
 
 #-------------------------------------------------#
 # # 3D VISUALIZATION

@@ -50,7 +50,7 @@ def checkpoint(epoch):
 
 device = torch.device("cpu")
 BATCH_SIZE = 64
-EPOCHS = 2
+EPOCHS = 5
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
@@ -66,7 +66,7 @@ print('===> Building model')
 model = Net(upscale_factor=32).to(device)
 criterion = nn.MSELoss()
 
-optimizer = optim.Adam(model.parameters(), lr=0.01)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 for epoch in range(1, EPOCHS + 1):
     train(epoch)

@@ -37,12 +37,15 @@ print(out_img_y.shape)
 
 data = opt.input_image.split("/")[-1]
 pwd = os.path.dirname(os.getcwd())
-label_dir = os.path.join(pwd, "data", "all_data", "test", "labels", f"{data}")
-label = np.mean(np.load(label_dir), axis=2)
+label_dir = os.path.join(os.getcwd(), "data", "all_data", "test", "labels", f"{data}")
+# label = np.mean(np.load(label_dir), axis=2) 
+label = np.load(label_dir)
 
 fig, axes = plt.subplots(1,2)
 axes[0].imshow(out_img_y, vmin=np.min(out_img_y), vmax=np.max(out_img_y))
+axes[0].set_title("Model output")
 axes[1].imshow(label)
+axes[1].set_title("Original label")
 fig.savefig("MODEL_OUTPUT.png")
 
 
