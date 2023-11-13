@@ -37,7 +37,6 @@ class DatasetFromFolder(data.Dataset):
     def __getitem__(self, index):
         input = load_array(join(self.data_dir, self.image_filenames[index]))
         input = np.float32(input)
-        print(input.shape)
         target = load_array(join(self.label_dir, self.image_filenames[index]))
         # target = np.float32(np.mean(target, axis=2)) # Do we need it axis-averaged?
         target = np.float32(target)

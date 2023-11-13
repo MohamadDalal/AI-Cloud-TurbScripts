@@ -19,7 +19,8 @@ def train(epoch):
         input, target = batch[0].to(device), batch[1].to(device)
 
         optimizer.zero_grad()
-        loss = criterion(model(input), target)
+        output = model(input)
+        loss = criterion(output, target)
         epoch_loss += loss.item()
         loss.backward()
         optimizer.step()
