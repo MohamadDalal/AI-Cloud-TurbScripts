@@ -19,7 +19,6 @@ opt = parser.parse_args()
 print(opt)
 img = np.load(opt.input_image)
 img = np.float32(img)
-print("HERE", img.shape)
 
 model = torch.load(opt.model)
 img_to_tensor = ToTensor()
@@ -41,14 +40,14 @@ out_img_y = out.data.numpy()
 
 data = opt.input_image.split("/")[-1]
 pwd = os.path.dirname(os.getcwd())
-label_dir = os.path.join(os.getcwd(),"..", "data", "all_data", "test", "labels", f"{data}")
+label_dir = os.path.join(os.getcwd(), "data", "all_data", "test", "labels", f"{data}")
 # label = np.mean(np.load(label_dir), axis=2) 
 label = np.load(label_dir)
 
 fig, axes = plt.subplots(1,2)
-axes[0].imshow(out_img_y)
+axes[0].imshow(np.mean(out_img_y, axis=2))
 axes[0].set_title("Model output")
-axes[1].imshow(label)
+axes[1].imshow(np.mean(label, axis=2))
 axes[1].set_title("Original label")
 fig.savefig("MODEL_OUTPUT.png")
 

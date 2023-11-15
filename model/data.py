@@ -1,7 +1,8 @@
 from os.path import join
-from os import getcwd, mkdir, listdir
-from torchvision.transforms import Compose, CenterCrop, ToTensor, Resize
+from os import getcwd, listdir
+from torchvision.transforms import Compose, ToTensor, Resize, GaussianBlur 
 from dataset import DatasetFromFolder
+from scipy.ndimage import gaussian_filter
 
 
 '''
@@ -29,6 +30,7 @@ data
 def input_transform():
     return Compose([
         ToTensor(),
+        GaussianBlur(9),
         Resize((49,16), antialias=True),
     ])
 

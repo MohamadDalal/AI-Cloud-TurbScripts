@@ -9,13 +9,14 @@ from os.path import join
 from os import getcwd
 from model import Net
 from data import get_training_set, get_test_set
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 def train(epoch):
     epoch_loss = 0
     for iteration, batch in enumerate(training_data_loader, 1):
         input, target = batch[0].to(device), batch[1].to(device)
-
         optimizer.zero_grad()
         output = model(input)
         loss = criterion(output, target)
@@ -49,7 +50,7 @@ def checkpoint(epoch):
 
 device = torch.device("cpu")
 BATCH_SIZE = 64
-EPOCHS = 10
+EPOCHS = 5
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")

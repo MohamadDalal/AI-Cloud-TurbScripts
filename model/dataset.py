@@ -3,6 +3,7 @@ import torch.utils.data as data
 from os import listdir
 from os.path import join, exists
 import numpy as np
+from sys import stdout
 
 
 def is_array_file(filename):
