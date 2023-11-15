@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 
+
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
 parser.add_argument('--input_image', type=str, required=True, help='input image to use')
@@ -18,6 +19,7 @@ opt = parser.parse_args()
 print(opt)
 img = np.load(opt.input_image)
 img = np.float32(img)
+print("HERE", img.shape)
 
 model = torch.load(opt.model)
 img_to_tensor = ToTensor()
@@ -27,22 +29,24 @@ if opt.cuda:
     model = model.cuda()
     input = input.cuda()
 
+
 out = model(input)
 out = out.cpu()
 out_img_y = out[0].detach().numpy()
-print(out_img_y.shape)
+out = torch.permute(out, (1,2,0))
+out_img_y = out.data.numpy()
 # out_img_y *= 255.0
 # out_img_y = out_img_y.clip(0, 255)
 # out_img_y = Image.fromarray(np.uint8(out_img_y[0]), mode='L')
 
 data = opt.input_image.split("/")[-1]
 pwd = os.path.dirname(os.getcwd())
-label_dir = os.path.join(os.getcwd(), "data", "all_data", "test", "labels", f"{data}")
+label_dir = os.path.join(os.getcwd(),"..", "data", "all_data", "test", "labels", f"{data}")
 # label = np.mean(np.load(label_dir), axis=2) 
 label = np.load(label_dir)
 
 fig, axes = plt.subplots(1,2)
-axes[0].imshow(out_img_y, vmin=np.min(out_img_y), vmax=np.max(out_img_y))
+axes[0].imshow(out_img_y)
 axes[0].set_title("Model output")
 axes[1].imshow(label)
 axes[1].set_title("Original label")

@@ -1,7 +1,6 @@
 from __future__ import print_function
 import argparse
 from math import log10
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -10,7 +9,6 @@ from os.path import join
 from os import getcwd
 from model import Net
 from data import get_training_set, get_test_set
-
 
 
 def train(epoch):
@@ -51,7 +49,7 @@ def checkpoint(epoch):
 
 device = torch.device("cpu")
 BATCH_SIZE = 64
-EPOCHS = 5
+EPOCHS = 10
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")

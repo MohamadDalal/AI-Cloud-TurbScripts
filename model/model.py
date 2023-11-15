@@ -16,17 +16,19 @@ class Net(nn.Module):
 
         self._initialize_weights()
 
+
     def forward(self, x):
         x = self.relu(self.conv1(x))
         x = self.relu(self.conv2(x))
         x = self.relu(self.conv3(x))
-        #x = self.pixel_shuffle(self.conv4(x))
-        x = self.conv4(x)
-        x1 = self.pixel_shuffle(x[:,:self.upscale_factor ** 2, ...])
-        x2 = self.pixel_shuffle(x[:,self.upscale_factor ** 2:2 * self.upscale_factor ** 2,...])
-        x3 = self.pixel_shuffle(x[:,2 * self.upscale_factor ** 2:,...])
-        x = torch.cat((x1,x2,x3), dim=1)
+        x = self.pixel_shuffle(self.conv4(x))
+        # x = self.conv4(x)
+        # x1 = self.pixel_shuffle(x[:,:self.upscale_factor ** 2, ...])
+        # x2 = self.pixel_shuffle(x[:,self.upscale_factor ** 2:2 * self.upscale_factor ** 2,...])
+        # x3 = self.pixel_shuffle(x[:,2 * self.upscale_factor ** 2:,...])
+        # x = torch.cat((x1,x2,x3), dim=1)
         return x
+
 
     def _initialize_weights(self):
         init.orthogonal_(self.conv1.weight, init.calculate_gain('relu'))
