@@ -16,6 +16,8 @@ if __name__=="__main__":
                         help="Path to save the h5 outputs to.")
     parser.add_argument("-p", "--num-processors", type=int, default=8,
                         help="Number of processors to use. Use 0 for max.")
+    parser.add_argument("--pressure", action='store_true',
+                        help="Get pressure instead of velocity.")
     args = parser.parse_args()
     df = pd.read_csv(args.csv_path)
     #print(df)
@@ -33,7 +35,12 @@ if __name__=="__main__":
             axis = 0
             output = f"{args.output_path}T{timestep}-X{index}-S{size}-A{axis}"
             print(timestep, index, size, axis)
-            process = Popen(["python", "getChannelSliceMultiprocessing.py", f"{timestep}", f"{index}", f"{output}",
+            if args.pressure:
+                print("\tGetting pressure")
+                process = Popen(["python", "getChannelSliceMultiprocessing.py", f"{timestep}", f"{index}", f"{output}",
+                             "-s", f"{size}", "-a", f"{axis}", "--num-processors", f"{args.num_processors}", "-p"])
+            else:
+                process = Popen(["python", "getChannelSliceMultiprocessing.py", f"{timestep}", f"{index}", f"{output}",
                              "-s", f"{size}", "-a", f"{axis}", "--num-processors", f"{args.num_processors}"])
             code = process.wait()
             #code = 0
