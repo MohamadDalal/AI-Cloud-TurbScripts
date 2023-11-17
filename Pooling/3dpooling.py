@@ -101,8 +101,8 @@ fChannel = os.path.join(data_dir, "2000_Full_Channel")
 fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 
 #inputDir = os.path.join(data_dir, "../dataSent")
-inputDir = os.path.join(data_dir, "../../channelData")
-outputDir = os.path.join(data_dir, "../model/data/all_data/train")
+inputDir = os.path.join(work_dir, "../../channelData")
+outputDir = os.path.join(work_dir, "../model/data/all_data/train")
 Path(os.path.join(outputDir, "data")).mkdir(parents=True, exist_ok=True)
 Path(os.path.join(outputDir, "labels")).mkdir(parents=True, exist_ok=True)
 
