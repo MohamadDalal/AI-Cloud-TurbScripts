@@ -8,3 +8,4 @@ __pycache__
 slurm*.out
 *model_epoch*.pth
 log.txt
+model/training_logs
