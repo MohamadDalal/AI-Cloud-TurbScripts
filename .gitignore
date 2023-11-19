@@ -6,3 +6,4 @@ authToken.txt
 checkIntegrity*.py
 __pycache__
 slurm*.out
+model*.pth

@@ -50,7 +50,7 @@ def checkpoint(epoch):
 
 device = torch.device("cpu")
 BATCH_SIZE = 64
-EPOCHS = 5
+EPOCHS = 2
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
