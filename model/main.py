@@ -11,7 +11,7 @@ from model import Net
 from data import get_training_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
-
+from time import perf_counter
 
 def train(epoch):
     epoch_loss = 0
@@ -49,8 +49,8 @@ def checkpoint(epoch):
 
 
 device = torch.device("cpu")
-BATCH_SIZE = 64
-EPOCHS = 5
+BATCH_SIZE = 128
+EPOCHS = 2
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
@@ -69,6 +69,9 @@ criterion = nn.MSELoss()
 optimizer = optim.Adam(model.parameters(), lr=0.001)
 
 for epoch in range(1, EPOCHS + 1):
+    start_time = perf_counter()
     train(epoch)
     test()
     checkpoint(epoch)
+    end_time = perf_counter()
+    print(f"Epoch {epoch} took {end_time-start_time}s")

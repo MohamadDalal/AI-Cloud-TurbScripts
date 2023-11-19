@@ -40,10 +40,13 @@ class DatasetFromFolder(data.Dataset):
         input = np.float32(input)
         target = load_array(join(self.label_dir, self.image_filenames[index]))
         # target = np.float32(np.mean(target, axis=2)) # Do we need it axis-averaged?
-        target = np.float32(target)
+        target = np.float32(target[...,1,:])
         if self.input_transform:
+            #print(input.shape)
             input = self.input_transform(input)
         if self.target_transform:
+            #print(target.shape)
+
             target = self.target_transform(target)
 
         return input, target
