@@ -6,4 +6,5 @@ authToken.txt
 checkIntegrity*.py
 __pycache__
 slurm*.out
-model*.pth
+*model_epoch*.pth
+log.txt
