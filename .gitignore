@@ -5,3 +5,4 @@ authToken.txt
 *.log
 checkIntegrity.py
 __pycache__
+slurm*.out
