@@ -3,6 +3,6 @@ authToken.txt
 *.xmf
 *.npy
 *.log
-checkIntegrity.py
+checkIntegrity*.py
 __pycache__
 slurm*.out
