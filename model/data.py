@@ -13,6 +13,9 @@ data
     └── train
         ├── data
         └── labels
+    └── validation
+        ├── data
+        └── labels
     └── test
         ├── data
         └── labels
@@ -41,7 +44,7 @@ def target_transform():
         Resize((1568,512), antialias=True),
     ])
 
-
+# Not used
 def train_test_split(train_ratio=0.8):
     root_dir = join(getcwd(), "data", "all_data")
     all_dir = join(root_dir, "train")
@@ -63,6 +66,14 @@ def get_training_set():
                              input_transform=input_transform(),
                              target_transform=target_transform())
 
+
+def get_validation_set():
+    root_dir = join(getcwd(), "data", "all_data")
+    validation_dir = join(root_dir, "validation")
+
+    return DatasetFromFolder(validation_dir,
+                             input_transform=input_transform(),
+                             target_transform=target_transform())
 
 def get_test_set():
     root_dir = join(getcwd(), "data", "all_data")

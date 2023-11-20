@@ -9,7 +9,7 @@ from os.path import join
 from os import getcwd
 from pathlib import Path
 from model import Net
-from data import get_training_set, get_test_set
+from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
@@ -33,10 +33,29 @@ def train(epoch):
     return epoch_loss, epoch_loss / len(training_data_loader), loss_list
 
 
+def validate():
+    avg_psnr = 0
+    psnr_list = []
+    epoch_mse = 0
+    mse_list = []
+    with torch.no_grad():
+        for batch in validation_data_loader:
+            input, target = batch[0].to(device), batch[1].to(device)
+
+            prediction = model(input)
+            mse = criterion(prediction, target)
+            epoch_mse += mse.item()
+            mse_list.append(mse.item())
+            psnr = 10 * log10(1 / mse.item())
+            avg_psnr += psnr
+            psnr_list.append(psnr)
+    print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validation_data_loader)))
+    return epoch_mse, epoch_mse / len(validation_data_loader), mse_list, avg_psnr, avg_psnr / len(validation_data_loader), psnr_list
+
 def test():
     avg_psnr = 0
     psnr_list = []
-    mse = 0
+    epoch_mse = 0
     mse_list = []
     with torch.no_grad():
         for batch in testing_data_loader:
@@ -44,13 +63,13 @@ def test():
 
             prediction = model(input)
             mse = criterion(prediction, target)
-            mse += mse.item()
+            epoch_mse += mse.item()
             mse_list.append(mse.item())
             psnr = 10 * log10(1 / mse.item())
             avg_psnr += psnr
             psnr_list.append(psnr)
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
-    return mse, mse / len(testing_data_loader), mse_list, avg_psnr, avg_psnr / len(testing_data_loader), psnr_list
+    return epoch_mse, epoch_mse / len(testing_data_loader), mse_list, avg_psnr, avg_psnr / len(testing_data_loader), psnr_list
 
 
 def checkpoint(epoch):
@@ -61,20 +80,20 @@ def checkpoint(epoch):
     print("Checkpoint saved to {}".format(model_out_path))
 
 
-def log_seperate_epoch(epoch, mse, test_mse, test_psnr):
+def log_seperate_epoch(epoch, mse, validation_mse, validation_psnr):
     save_path = Path(join(logging_path, f"Epoch_{epoch}"))
     Path(save_path).mkdir(parents=train, exist_ok=True)
     np.savetxt(f"{save_path}/mse.csv", mse)
-    np.savetxt(f"{save_path}/test_mse.csv", test_mse)
-    np.savetxt(f"{save_path}/test_psnr.csv", test_psnr)
+    np.savetxt(f"{save_path}/validation_mse.csv", validation_mse)
+    np.savetxt(f"{save_path}/validation_psnr.csv", validation_psnr)
 
 def log_all():
     np.savetxt(f"{logging_path}/mse.csv", all_mse)
     np.savetxt(f"{logging_path}/avg_mse.csv", all_avg_mse)
-    np.savetxt(f"{logging_path}/test_mse.csv", all_test_mse)
-    np.savetxt(f"{logging_path}/test_avg_mse.csv", all_test_avg_mse)
-    np.savetxt(f"{logging_path}/test_psnr.csv", all_test_psnr)
-    np.savetxt(f"{logging_path}/test_avg_psnr.csv", all_test_avg_psnr)
+    np.savetxt(f"{logging_path}/validation_mse.csv", all_validation_mse)
+    np.savetxt(f"{logging_path}/validation_avg_mse.csv", all_validation_avg_mse)
+    np.savetxt(f"{logging_path}/validation_psnr.csv", all_validation_psnr)
+    np.savetxt(f"{logging_path}/validation_avg_psnr.csv", all_validation_avg_psnr)
 
 
 device = torch.device("cpu")
@@ -83,17 +102,20 @@ EPOCHS = 50
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
+validation_set_dir = join(getcwd(), "data", "all_data", "validation")
 test_set_dir = join(getcwd(), "data", "all_data", "test")
 
 train_set = get_training_set()
+validation_set = get_validation_set
 test_set = get_test_set()
 
 training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
+validation_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 logging_path = join(getcwd(), "training_logs")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
-all_mse, all_avg_mse, all_test_mse, all_test_avg_mse, all_test_psnr, all_test_avg_psnr = [], [], [], [], [] ,[]
+all_mse, all_avg_mse, all_validation_mse, all_validation_avg_mse, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
 
 
 print('===> Building model')
@@ -105,16 +127,16 @@ optimizer = optim.Adam(model.parameters(), lr=0.001)
 for epoch in range(1, EPOCHS + 1):
     start_time = perf_counter()
     mse, avg_mse, iter_mse = train(epoch)
-    test_mse, test_avg_mse, test_iter_mse, test_psnr, test_avg_psnr, test_iter_psnr = test()
+    validation_mse, validation_avg_mse, validation_iter_mse, validation_psnr, validation_avg_psnr, validation_iter_psnr = validate()
     checkpoint(epoch)
     end_time = perf_counter()
     print(f"Epoch {epoch} took {end_time-start_time}s")
     all_mse.append(mse)
     all_avg_mse.append(avg_mse)
-    all_test_mse.append(test_mse)
-    all_test_avg_mse.append(test_avg_mse)
-    all_test_psnr.append(test_psnr)
-    all_test_avg_psnr.append(test_avg_psnr)
-    log_seperate_epoch(epoch, iter_mse, test_iter_mse, test_iter_psnr)
+    all_validation_mse.append(validation_mse)
+    all_validation_avg_mse.append(validation_avg_mse)
+    all_validation_psnr.append(validation_psnr)
+    all_validation_avg_psnr.append(validation_avg_psnr)
+    log_seperate_epoch(epoch, iter_mse, validation_iter_mse, validation_iter_psnr)
 
 log_all()
