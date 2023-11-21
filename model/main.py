@@ -100,11 +100,14 @@ def log_all():
     np.savetxt(f"{logging_path}/validation_psnr.csv", all_validation_psnr)
     np.savetxt(f"{logging_path}/validation_avg_psnr.csv", all_validation_avg_psnr)
 
+if torch.cuda.is_available():
+    torch.device("cuda")
+else:
+    device = torch.device("cpu")
 
-device = torch.device("cpu")
-BATCH_SIZE = 16
+BATCH_SIZE = 128
 EPOCHS = 30
-START_EPOCH = 20
+START_EPOCH = 0
 CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
 
 print('===> Loading datasets')
