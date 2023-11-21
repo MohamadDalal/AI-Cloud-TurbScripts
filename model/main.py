@@ -76,7 +76,12 @@ def checkpoint(epoch):
     model_out_dir = join(getcwd(), "model_checkpoints")
     Path(model_out_dir).mkdir(parents=True, exist_ok=True)
     model_out_path = "{}/model_epoch_{}.pth".format(model_out_dir, epoch)
-    torch.save(model, model_out_path)
+    #torch.save(model, model_out_path)
+    torch.save({
+        "epoch": epoch,
+        "model_state_dict": model.state_dict(),
+        "optimizer_state_dict": optimizer.state_dict()
+        }, model_out_path)
     print("Checkpoint saved to {}".format(model_out_path))
 
 
@@ -97,8 +102,10 @@ def log_all():
 
 
 device = torch.device("cpu")
-BATCH_SIZE = 128
-EPOCHS = 50
+BATCH_SIZE = 16
+EPOCHS = 30
+START_EPOCH = 20
+CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
@@ -119,14 +126,38 @@ all_mse, all_avg_mse, all_validation_mse, all_validation_avg_mse, all_validation
 
 
 print('===> Building model')
+"""
+if START_EPOCH > 0:
+    model = torch.load(CHECKPOINT_PATH)
+    all_mse = [0 for _ in range(START_EPOCH)]
+    all_avg_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_avg_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_psnr = [0 for _ in range(START_EPOCH)]
+    all_validation_avg_psnr = [0 for _ in range(START_EPOCH)]
+else:
+    model = Net(upscale_factor=32).to(device)
+"""
 model = Net(upscale_factor=32).to(device)
 criterion = nn.MSELoss()
 
 optimizer = optim.Adam(model.parameters(), lr=0.001)
+if START_EPOCH > 0:
+    checkpoint_dict = torch.load(CHECKPOINT_PATH)
+    model.load_state_dict(checkpoint_dict["model_state_dict"])
+    optimizer.load_state_dict(checkpoint_dict["optimizer_state_dict"])
+    all_mse = [0 for _ in range(START_EPOCH)]
+    all_avg_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_avg_mse = [0 for _ in range(START_EPOCH)]
+    all_validation_psnr = [0 for _ in range(START_EPOCH)]
+    all_validation_avg_psnr = [0 for _ in range(START_EPOCH)]
 
-for epoch in range(1, EPOCHS + 1):
+for epoch in range(START_EPOCH + 1, EPOCHS + 1):
     start_time = perf_counter()
+    model.train()
     mse, avg_mse, iter_mse = train(epoch)
+    model.eval()
     validation_mse, validation_avg_mse, validation_iter_mse, validation_psnr, validation_avg_psnr, validation_iter_psnr = validate()
     checkpoint(epoch)
     end_time = perf_counter()
@@ -138,5 +169,13 @@ for epoch in range(1, EPOCHS + 1):
     all_validation_psnr.append(validation_psnr)
     all_validation_avg_psnr.append(validation_avg_psnr)
     log_seperate_epoch(epoch, iter_mse, validation_iter_mse, validation_iter_psnr)
+
+for i in range(START_EPOCH):
+    all_mse[i] = (all_mse[START_EPOCH])
+    all_avg_mse[i] = (all_avg_mse[START_EPOCH])
+    all_validation_mse[i] = (all_validation_mse[START_EPOCH])
+    all_validation_avg_mse[i] = (all_validation_avg_mse[START_EPOCH])
+    all_validation_psnr[i] = (all_validation_psnr[START_EPOCH])
+    all_validation_avg_psnr[i] = (all_validation_avg_psnr[START_EPOCH])
 
 log_all()
