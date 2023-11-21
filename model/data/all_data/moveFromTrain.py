@@ -10,8 +10,8 @@ validation_dir2 = os.path.join(os.getcwd(), "validation/labels")
 test_dir = os.path.join(os.getcwd(), "test/data")
 test_dir2 = os.path.join(os.getcwd(), "test/labels")
 
-validation_list = np.loadtxt("validation_chunks.csv")
-test_list = np.loadtxt("test_chunks.csv")
+validation_list = np.genfromtxt("validation_chunks.csv", dtype="str")
+test_list = np.genfromtxt("test_chunks.csv", dtype="str")
 
 for x in validation_list:
     for i in range(10):
