@@ -2,7 +2,7 @@ from __future__ import print_function
 import argparse
 import torch
 from PIL import Image
-from torchvision.transforms import ToTensor
+from torchvision.transforms import Compose, ToTensor, Resize, GaussianBlur
 import matplotlib.pyplot as plt
 import os
 import numpy as np
@@ -26,12 +26,20 @@ if torch.cuda.is_available() and opt.cuda:
 else:
     device = torch.device("cpu")
 
-checkpoint_dict = torch.load(opt.model, map_location=torch.device("cpu"))
-model = Net(upscale_factor=32).to(device)
-model.load_state_dict(checkpoint_dict["model_state_dict"])
+#checkpoint_dict = torch.load(opt.model, map_location=torch.device("cpu"))
+#model = Net(upscale_factor=32).to(device)
+#model.load_state_dict(checkpoint_dict["model_state_dict"])
+model = torch.load(opt.model)
 model.eval()
-img_to_tensor = ToTensor()
+#img_to_tensor = ToTensor()
+img_to_tensor = Compose([
+        ToTensor(),
+        GaussianBlur(9),
+        Resize((49,16), antialias=True),
+    ])
 input = img_to_tensor(img).to(device)
+print(img)
+print(input)
 
 
 out = model(input)
@@ -50,7 +58,8 @@ label_dir = os.path.join(os.getcwd(), "data", "all_data", "test", "labels", f"{d
 label = np.load(label_dir)
 
 fig, axes = plt.subplots(1,3)
-axes[0].imshow(np.mean(img, axis=2))
+print(input.numpy().shape)
+axes[0].imshow(np.mean(input.numpy(), axis=0))
 axes[0].set_title("Input image")
 axes[1].imshow(np.mean(out_img_y, axis=2))
 axes[1].set_title("Model output")

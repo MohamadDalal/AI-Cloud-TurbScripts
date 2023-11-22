@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 from os.path import join
 from os import getcwd
 from pathlib import Path
-from model import Net
+from model2 import Net
 from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
@@ -65,6 +65,7 @@ def test():
             mse = criterion(prediction, target)
             epoch_mse += mse.item()
             mse_list.append(mse.item())
+            #mse_list.append(mse.detach())
             psnr = 10 * log10(1 / mse.item())
             avg_psnr += psnr
             psnr_list.append(psnr)
