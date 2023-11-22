@@ -101,7 +101,8 @@ def log_all():
     np.savetxt(f"{logging_path}/validation_avg_psnr.csv", all_validation_avg_psnr)
 
 if torch.cuda.is_available():
-    torch.device("cuda")
+    print("Cuda is available")
+    device = torch.device("cuda")
 else:
     device = torch.device("cpu")
 
