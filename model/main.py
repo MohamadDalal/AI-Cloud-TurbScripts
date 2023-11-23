@@ -8,7 +8,8 @@ from torch.utils.data import DataLoader
 from os.path import join
 from os import getcwd
 from pathlib import Path
-from model2 import Net
+from model import Net
+#from model2 import Net
 from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
@@ -148,8 +149,9 @@ else:
 """
 model = Net(upscale_factor=32).to(device)
 criterion = nn.MSELoss()
+#criterion = nn.L1Loss()
 
-optimizer = optim.Adam(model.parameters(), lr=0.001)
+optimizer = optim.Adam(model.parameters(), lr=0.0001)
 if START_EPOCH > 0:
     checkpoint_dict = torch.load(CHECKPOINT_PATH)
     model.load_state_dict(checkpoint_dict["model_state_dict"])
