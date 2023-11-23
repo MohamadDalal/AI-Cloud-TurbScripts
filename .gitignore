@@ -9,4 +9,5 @@ slurm*.out
 *model_epoch*.pth
 log.txt
 model/training_logs
+model/test_logs
 Logs_from_the_cloud

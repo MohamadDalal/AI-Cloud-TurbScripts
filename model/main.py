@@ -22,12 +22,13 @@ def train(epoch):
         optimizer.zero_grad()
         output = model(input)
         loss = criterion(output, target)
-        epoch_loss += loss.item()
+        batch_mse = loss.item()
+        epoch_loss += batch_mse
         loss.backward()
         optimizer.step()
 
-        print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(training_data_loader), loss.item()))
-        loss_list.append(loss.item())
+        print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(training_data_loader), batch_mse))
+        loss_list.append(batch_mse)
 
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
     return epoch_loss, epoch_loss / len(training_data_loader), loss_list
@@ -44,9 +45,10 @@ def validate():
 
             prediction = model(input)
             mse = criterion(prediction, target)
-            epoch_mse += mse.item()
-            mse_list.append(mse.item())
-            psnr = 10 * log10(1 / mse.item())
+            batch_mse = mse.item()
+            epoch_mse += batch_mse
+            mse_list.append(batch_mse)
+            psnr = 10 * log10(1 / batch_mse)
             avg_psnr += psnr
             psnr_list.append(psnr)
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validation_data_loader)))
@@ -63,10 +65,11 @@ def test():
 
             prediction = model(input)
             mse = criterion(prediction, target)
-            epoch_mse += mse.item()
-            mse_list.append(mse.item())
+            batch_mse = mse.item()
+            epoch_mse += batch_mse
+            mse_list.append(batch_mse)
             #mse_list.append(mse.detach())
-            psnr = 10 * log10(1 / mse.item())
+            psnr = 10 * log10(1 / batch_mse)
             avg_psnr += psnr
             psnr_list.append(psnr)
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
@@ -88,7 +91,7 @@ def checkpoint(epoch):
 
 def log_seperate_epoch(epoch, mse, validation_mse, validation_psnr):
     save_path = Path(join(logging_path, f"Epoch_{epoch}"))
-    Path(save_path).mkdir(parents=train, exist_ok=True)
+    Path(save_path).mkdir(parents=True, exist_ok=True)
     np.savetxt(f"{save_path}/mse.csv", mse)
     np.savetxt(f"{save_path}/validation_mse.csv", validation_mse)
     np.savetxt(f"{save_path}/validation_psnr.csv", validation_psnr)

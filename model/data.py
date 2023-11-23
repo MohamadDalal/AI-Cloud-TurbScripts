@@ -34,14 +34,15 @@ def input_transform():
     return Compose([
         ToTensor(),
         GaussianBlur(9),
-        Resize((49,16), antialias=True),
+        #Resize((49,16), antialias=True),
+        Resize((48,16), antialias=True),
     ])
 
 
 def target_transform():
     return Compose([
         ToTensor(),
-        Resize((1568,512), antialias=True),
+        #Resize((1568,512), antialias=True),
     ])
 
 # Not used
