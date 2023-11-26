@@ -1,0 +1,4 @@
+Batch Size 128
+Epochs 50
+75-25 train, validation split
+ADAM Optimizer with constant learning rate of 0.001

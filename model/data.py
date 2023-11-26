@@ -1,5 +1,6 @@
 from os.path import join
 from os import getcwd, listdir
+import torch
 from torchvision.transforms import Compose, ToTensor, Resize, GaussianBlur 
 from dataset import DatasetFromFolder
 from scipy.ndimage import gaussian_filter
@@ -11,6 +12,9 @@ from scipy.ndimage import gaussian_filter
 data
 ├── all_data
     └── train
+        ├── data
+        └── labels
+    └── validation
         ├── data
         └── labels
     └── test
@@ -30,18 +34,19 @@ data
 def input_transform():
     return Compose([
         ToTensor(),
-        GaussianBlur(9),
-        Resize((49,16), antialias=True),
+        GaussianBlur(9, 1),
+        #Resize((49,16), antialias=True),
+        Resize((48,16), antialias=True),
     ])
 
 
 def target_transform():
     return Compose([
         ToTensor(),
-        Resize((1568,512), antialias=True),
+        #Resize((1568,512), antialias=True),
     ])
 
-
+# Not used
 def train_test_split(train_ratio=0.8):
     root_dir = join(getcwd(), "data", "all_data")
     all_dir = join(root_dir, "train")
@@ -58,16 +63,40 @@ def train_test_split(train_ratio=0.8):
 def get_training_set():
     root_dir = join(getcwd(), "data", "all_data")
     train_dir = join(root_dir, "train")
+    if torch.cuda.is_available():
+        print("get_training_set: Cuda is available")
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
 
     return DatasetFromFolder(train_dir,
+                             device,
                              input_transform=input_transform(),
                              target_transform=target_transform())
 
 
+def get_validation_set():
+    root_dir = join(getcwd(), "data", "all_data")
+    validation_dir = join(root_dir, "validation")
+    if torch.cuda.is_available():
+        print("get_validation_set: Cuda is available")
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
+    return DatasetFromFolder(validation_dir,
+                             device,
+                             input_transform=input_transform(),
+                             target_transform=target_transform())
+
 def get_test_set():
     root_dir = join(getcwd(), "data", "all_data")
     test_dir = join(root_dir, "test")
-
+    if torch.cuda.is_available():
+        print("get_test_set: Cuda is available")
+        device = torch.device("cuda")
+    else:
+        device = torch.device("cpu")
     return DatasetFromFolder(test_dir,
+                             device,
                              input_transform=input_transform(),
                              target_transform=target_transform())
