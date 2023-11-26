@@ -32,7 +32,7 @@ def test(model, criterion):
             avg_psnr += psnr
             psnr_list.append((test_set.image_filenames[index], psnr))
             #print(f"{test_set.image_filenames[index]}, {batch_mse}, {psnr}")
-    print("===> Avg. MSE: {:.4f} dB".format(epoch_mse / len(testing_data_loader)))
+    print("===> Avg. MSE: {:.4f}".format(epoch_mse / len(testing_data_loader)))
     print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
     return epoch_mse, epoch_mse / len(testing_data_loader), mse_list, avg_psnr, avg_psnr / len(testing_data_loader), psnr_list
 
@@ -45,7 +45,8 @@ def log_seperate_epoch(test_mse, test_psnr, logging_path):
     pd.DataFrame(test_psnr).to_csv(f"{save_path}/test_psnr.csv", index=False)
 
 BATCH_SIZE = 1
-CHECKPOINT_PATH = "../Logs_from_the_cloud/Wednesday-22-11-2023/model_checkpoints/model_epoch_30.pth"
+#CHECKPOINT_PATH = "../Logs_from_the_cloud/Wednesday-22-11-2023/model_checkpoints/model_epoch_30.pth"
+CHECKPOINT_PATH = "../Logs_from_the_cloud/Friday-24-11-2023-2/model_checkpoints/model_epoch_30.pth"
 SAVE_PATH = "test_logs/"
 
 
@@ -70,20 +71,20 @@ test_mse1, test_avg_mse1, test_iter_mse1, test_psnr1, test_avg_psnr1, test_iter_
 model1_end = perf_counter()
 print(f"Time taken for model 1 = {model1_end-model1_start}")
 
-M1_Path = join(SAVE_PATH, "M1-B128-E30")
+M1_Path = join(SAVE_PATH, "M1-B128-E30-L001-FixedResize-FixedGaussian-FixedDataloader")
 log_seperate_epoch(test_iter_mse1, test_iter_psnr1, M1_Path)
 with open(f"{M1_Path}/SingleResults.txt", "w") as f:
     f.write(f"TOT_MSE = {test_mse1}\nTOT_PSNR = {test_psnr1}\nAVG_MSE = {test_avg_mse1}\nAVG_PSNR = {test_avg_psnr1}\nTime_Taken = {model1_end-model1_start}s")
 
-
-model2 = lambda x : nn.functional.interpolate(x, (1568, 512), mode="bicubic")
+#exit()
+model2 = lambda x : nn.functional.interpolate(x, (1536, 512), mode="bicubic")
 
 model2_start = perf_counter()
 test_mse2, test_avg_mse2, test_iter_mse2, test_psnr2, test_avg_psnr2, test_iter_psnr2 = test(model2, criterion_mse)
 model2_end = perf_counter()
 print(f"Time taken for model 2 = {model2_end-model2_start}")
 
-M2_Path = join(SAVE_PATH, "Bicubic")
+M2_Path = join(SAVE_PATH, "Bicubic-FixedDataloader")
 log_seperate_epoch(test_iter_mse2, test_iter_psnr2, M2_Path)
 with open(f"{M2_Path}/SingleResults.txt", "w") as f:
     f.write(f"TOT_MSE = {test_mse2}\nTOT_PSNR = {test_psnr2}\nAVG_MSE = {test_avg_mse2}\nAVG_PSNR = {test_avg_psnr2}\nTime_Taken = {model2_end-model2_start}s")

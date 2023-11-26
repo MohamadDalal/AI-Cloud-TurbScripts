@@ -1,0 +1,7 @@
+Batch size 128
+Epochs 30
+70-20-10 train, validation, test split
+ADAM Optimizer with constant learning rate of 0.001
+Model 2
+
+

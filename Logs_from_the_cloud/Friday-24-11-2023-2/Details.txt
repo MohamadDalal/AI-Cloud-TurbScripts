@@ -1,0 +1,9 @@
+Batch size 128
+Epochs 30
+70-20-10 train, validation, test split
+ADAM Optimizer with constant learning rate of 0.001
+MSE Loss
+Fixed Random Gaussian Blur
+Now transformers only resize input, and not ground truth data
+
+

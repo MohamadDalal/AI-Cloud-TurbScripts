@@ -15,7 +15,7 @@ def load_array(filepath):
 
 
 class DatasetFromFolder(data.Dataset):
-    def __init__(self, image_dir, input_transform=None, target_transform=None, image_filenames=None):
+    def __init__(self, image_dir, device, input_transform=None, target_transform=None, image_filenames=None):
         super(DatasetFromFolder, self).__init__()
         #self.image_filenames = [join(image_dir, x) for x in listdir(image_dir) if is_array_file(x)]
         self.data_dir = join(image_dir, "data")
@@ -32,6 +32,7 @@ class DatasetFromFolder(data.Dataset):
             else:
                 print(f'No label array exists for slice {self.image_filenames[index]}')
                 self.image_filenames.pop(index)
+        self.device = device
         self.input_transform = input_transform
         self.target_transform = target_transform
 

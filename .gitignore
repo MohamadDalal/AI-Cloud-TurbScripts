@@ -9,5 +9,4 @@ slurm*.out
 *model_epoch*.pth
 log.txt
 model/training_logs
-model/test_logs
-Logs_from_the_cloud
+!Logs_from_the_cloud/Friday-24-11-2023-2/model_checkpoints/model_epoch_30.pth
