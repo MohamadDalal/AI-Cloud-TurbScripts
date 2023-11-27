@@ -3,6 +3,7 @@ from sys import stdout
 import numpy as np
 import os
 import matplotlib.pyplot as plt
+from pathlib import Path
 
 
 def progress_bar(iteration:int, total:int, bar_length=50):
@@ -53,7 +54,7 @@ def max_pool_3d(method, input_array, pool_size=(3, 3, 3)):
     return pooled_array
 
 
-def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=True):
+def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=True, slice_axis=2):
     '''
     3D pooling operation on a given 3D array.
     
@@ -62,6 +63,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
     :method: Numpy method for pooling (np.mean, np.median, np.max, np.min,...)
     :pool_size: Size of a pooling filter
     :loading_bar: Display loading bar in terminal
+    :slice_axis: Axis to make slices from
     '''
     all_file_list = os.listdir(input_dir)
     file_list_h5 = [x for x in all_file_list if x.split(".")[-1] == "h5"]
@@ -74,8 +76,12 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
             pooled_channel = max_pool_3d(method, input_array[...,j], pool_size) 
             channels.append(pooled_channel[..., np.newaxis])
         pooled_array = np.concatenate(channels, axis=3)
-        print(f"{output_dir}/{x[:-3]}")
-        np.save(f"{output_dir}/{x[:-3]}", pooled_array)
+        print(f"{output_dir}/{x[:-3]}\t{i}")
+        for j in range(pooled_array.shape[slice_axis]):
+            start = pool_size[slice_axis]*j
+            end = start + pool_size[slice_axis]
+            np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", pooled_array.take(j, slice_axis))
+            np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
         if loading_bar:
             progress_bar(i+1, len(file_list_h5))
 
@@ -85,8 +91,8 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
 work_dir = os.getcwd()
 data_dir = os.path.join(work_dir, "data")
 
-dSent = os.path.join(data_dir, "dataSent")
-dSent_Pooled = os.path.join(data_dir, "dataSent_Pooled")
+dSent = os.path.join(data_dir, "../dataSent")
+dSent_Pooled = os.path.join(data_dir, "../dataSent_Pooled")
 
 cData = os.path.join(data_dir, "channelData")
 cData_Pooled = os.path.join(data_dir, "channelData_Pooled")
@@ -94,9 +100,14 @@ cData_Pooled = os.path.join(data_dir, "channelData_Pooled")
 fChannel = os.path.join(data_dir, "2000_Full_Channel")
 fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 
+#inputDir = os.path.join(data_dir, "../dataSent")
+inputDir = os.path.join(work_dir, "../../channelData")
+outputDir = os.path.join(work_dir, "../model/data/all_data/train")
+Path(os.path.join(outputDir, "data")).mkdir(parents=True, exist_ok=True)
+Path(os.path.join(outputDir, "labels")).mkdir(parents=True, exist_ok=True)
 
 # batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
-batch_pool(input_dir=dSent, output_dir=dSent_Pooled, method=np.mean, pool_size=(31,31,3))
+batch_pool(input_dir=inputDir, output_dir=outputDir, method=np.mean, pool_size=(31,31,3), slice_axis=2)
 # batch_pool(input_dir=cData, output_dir=cData_Pooled, method=np.mean, pool_size=(31,31,3))
 
 #-------------------------------------------------#
