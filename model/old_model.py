@@ -8,9 +8,9 @@ class Net(nn.Module):
         super(Net, self).__init__()
         self.upscale_factor = upscale_factor
         self.relu = nn.ReLU()
-        self.conv1 = nn.Conv2d(3, 64, (13, 13), (1, 1), (6, 6))
-        self.conv2 = nn.Conv2d(64, 64, (9, 9), (1, 1), (4, 4))
-        self.conv3 = nn.Conv2d(64, 32, (5, 5), (1, 1), (2, 2))
+        self.conv1 = nn.Conv2d(3, 64, (5, 5), (1, 1), (2, 2))
+        self.conv2 = nn.Conv2d(64, 64, (3, 3), (1, 1), (1, 1))
+        self.conv3 = nn.Conv2d(64, 32, (3, 3), (1, 1), (1, 1))
         self.conv4 = nn.Conv2d(32, 3 * self.upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
         self.pixel_shuffle = nn.PixelShuffle(self.upscale_factor)
 
