@@ -4,9 +4,10 @@ import numpy as np
 import os
 import matplotlib.pyplot as plt
 from pathlib import Path
+from time import perf_counter
 import cv2 as cv
 
-def progress_bar(iteration:int, total:int, bar_length=50):
+def progress_bar(iteration:int, total:int, time_taken, bar_length=50):
     '''
     Track progress of a loop.
 
@@ -18,7 +19,7 @@ def progress_bar(iteration:int, total:int, bar_length=50):
     arrow = '=' * int(round(bar_length * progress))
     spaces = ' ' * (bar_length - len(arrow))
     percent = int(progress * 100)
-    stdout.write(f'[{arrow}{spaces}] {percent}%\r')
+    stdout.write(f'[{arrow}{spaces}] {percent}%\t{time_taken}s\r')
     stdout.flush()
 
 
@@ -71,6 +72,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(8,8,3), loading_bar=Tru
     count = 11 #iterator for Gaussian blur
 
     for i, x in enumerate(file_list_h5):
+        start_time = perf_counter()
         channels = []
         input_array = data[i][tuple(data[i].keys())[0]]
         for j in range(input_array.shape[-1]):
@@ -81,13 +83,14 @@ def batch_pool(input_dir, output_dir, method, pool_size=(8,8,3), loading_bar=Tru
         for j in range(pooled_array.shape[slice_axis]):
             #start = pool_size[slice_axis]*j
             #end = start + pool_size[slice_axis]
-            blur_krnl_9 = cv.GaussianBlur(pooled_array.take(j, slice_axis),(5,5),1) #Gaussian blur on pooled_arrays
+            blur_krnl_9 = cv.GaussianBlur(pooled_array.take(j, slice_axis),(9,9),1) #Gaussian blur on pooled_arrays
             for i in range(count):
                 more_blur_krnl_9 = cv.GaussianBlur(blur_krnl_9,(9,9),1)
             np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", more_blur_krnl_9) #changed this line to instead take
             #np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
+        end_time = perf_counter()
         if loading_bar:
-            progress_bar(i+1, len(file_list_h5))
+            progress_bar(i+1, len(file_list_h5), end_time-start_time)
 
     return None
 
