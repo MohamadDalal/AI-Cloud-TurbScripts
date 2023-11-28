@@ -69,7 +69,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(8,8,3), loading_bar=Tru
     all_file_list = os.listdir(input_dir)
     file_list_h5 = [x for x in all_file_list if x.split(".")[-1] == "h5"]
     data = [h5py.File(f"{input_dir}/{x}") for x in file_list_h5]
-    count = 11 #iterator for Gaussian blur
+    count = 9 #iterator for Gaussian blur
 
     for i, x in enumerate(file_list_h5):
         start_time = perf_counter()
@@ -85,8 +85,8 @@ def batch_pool(input_dir, output_dir, method, pool_size=(8,8,3), loading_bar=Tru
             #end = start + pool_size[slice_axis]
             blur_krnl_9 = cv.GaussianBlur(pooled_array.take(j, slice_axis),(9,9),1) #Gaussian blur on pooled_arrays
             for i in range(count):
-                more_blur_krnl_9 = cv.GaussianBlur(blur_krnl_9,(9,9),1)
-            np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", more_blur_krnl_9) #changed this line to instead take
+                blur_krnl_9 = cv.GaussianBlur(blur_krnl_9,(9,9),1)
+            np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", blur_krnl_9) #changed this line to instead take
             #np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
         end_time = perf_counter()
         if loading_bar:
