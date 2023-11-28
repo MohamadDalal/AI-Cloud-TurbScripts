@@ -77,15 +77,14 @@ def batch_pool(input_dir, output_dir, method, pool_size=(8,8,3), loading_bar=Tru
             pooled_channel = max_pool_3d(method, input_array[...,j], pool_size) 
             channels.append(pooled_channel[..., np.newaxis])
         pooled_array = np.concatenate(channels, axis=3)
-        blur_krnl_9 = cv.GaussianBlur(np.sum(pooled_array[...,0,:]**2, axis=2),(5,5),1) #Gaussian blur on pooled_arrays
-        for i in range(count):
-            more_blur_krnl_9 = cv.GaussianBlur(blur_krnl_9,(5,5),1)
         print(f"{output_dir}/{x[:-3]}\t{i}")
-
-        for j in range(more_blur_krnl_9.shape[slice_axis]):
+        for j in range(pooled_array.shape[slice_axis]):
             #start = pool_size[slice_axis]*j
             #end = start + pool_size[slice_axis]
-            np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", more_blur_krnl_9.take(j, slice_axis)) #changed this line to instead take
+            blur_krnl_9 = cv.GaussianBlur(pooled_array.take(j, slice_axis),(5,5),1) #Gaussian blur on pooled_arrays
+            for i in range(count):
+                more_blur_krnl_9 = cv.GaussianBlur(blur_krnl_9,(5,5),1)
+            np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", more_blur_krnl_9) #changed this line to instead take
             #np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
         if loading_bar:
             progress_bar(i+1, len(file_list_h5))
@@ -109,7 +108,7 @@ fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 inputDir = os.path.join(work_dir, "../../channelData")
 outputDir = os.path.join(work_dir, "../model/data/all_data/train")
 Path(os.path.join(outputDir, "data")).mkdir(parents=True, exist_ok=True)
-Path(os.path.join(outputDir, "labels")).mkdir(parents=True, exist_ok=True)
+#Path(os.path.join(outputDir, "labels")).mkdir(parents=True, exist_ok=True)
 
 # batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
 batch_pool(input_dir=inputDir, output_dir=outputDir, method=np.mean, pool_size=(8,8,3), slice_axis=2)
