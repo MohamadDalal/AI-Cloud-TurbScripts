@@ -14,6 +14,7 @@ from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
 from time import perf_counter
+from Custom_loss import div_loss
 
 def train(epoch):
     epoch_loss = 0
@@ -148,8 +149,9 @@ else:
     model = Net(upscale_factor=32).to(device)
 """
 model = Net(upscale_factor=8).to(device)
-criterion = nn.MSELoss()
+#criterion = nn.MSELoss()
 #criterion = nn.L1Loss()
+criterion = div_loss()
 
 optimizer = optim.Adam(model.parameters(), lr=0.0001)
 if START_EPOCH > 0:
