@@ -36,7 +36,7 @@ def input_transform():
         ToTensor(),
         GaussianBlur(9, 1),
         #Resize((49,16), antialias=True),
-        Resize((48,16), antialias=True),
+        #Resize((48,16), antialias=True),
     ])
 
 

@@ -28,7 +28,7 @@ def train(epoch):
         loss.backward()
         optimizer.step()
 
-        print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(training_data_loader), batch_mse))
+        #print("===> Epoch[{}]({}/{}): Loss: {:.4f}".format(epoch, iteration, len(training_data_loader), batch_mse))
         loss_list.append(batch_mse)
 
     print("===> Epoch {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
@@ -122,11 +122,11 @@ validation_set_dir = join(getcwd(), "data", "all_data", "validation")
 test_set_dir = join(getcwd(), "data", "all_data", "test")
 
 train_set = get_training_set()
-validation_set = get_validation_set
+validation_set = get_validation_set()
 test_set = get_test_set()
 
 training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
-validation_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
+validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 logging_path = join(getcwd(), "training_logs")
@@ -147,7 +147,7 @@ if START_EPOCH > 0:
 else:
     model = Net(upscale_factor=32).to(device)
 """
-model = Net(upscale_factor=32).to(device)
+model = Net(upscale_factor=8).to(device)
 criterion = nn.MSELoss()
 #criterion = nn.L1Loss()
 
