@@ -12,3 +12,6 @@ model/training_logs
 !Logs_from_the_cloud/Friday-24-11-2023-2/model_checkpoints/model_epoch_30.pth
 model/49x16data
 model/data_RANS
+AI-Cloud-TurbScripts/model/data/all_data/train
+AI-Cloud-TurbScripts/model/data/all_data/validaiton
+AI-Cloud-TurbScripts/model/data/all_data/test
