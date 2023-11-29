@@ -16,30 +16,84 @@ Downsampled Skip-Connection/Multi-Scale (DSC/MS) mode """
 
 
 
+
 class Net(nn.Module):
     def __init__(self, upscale_factor):
         super(Net, self).__init__()
         self.upscale_factor = upscale_factor
         self.relu = nn.ReLU()
 
-        # first layer
-        self.conv1 = nn.Conv2d(3, 16, kernel_size=13, stride=1, padding=6) #padding = (kernelsize-1)/2 to ensure same resolution as input
-        self.conv2 = nn.Conv2d(16, 16, kernel_size=13, stride=1, padding=6)
-        self.conv3 = nn.Conv2d(16, 16, kernel_size=13, stride=1, padding=6)
+       # first layer
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, padding=2) #padding = (kernelsize-1)/2 to ensure same resolution as input
+        self.conv2 = nn.Conv2d(16, 16, kernel_size=9, padding=4)
+        self.conv3 = nn.Conv2d(16, 16, kernel_size=13, padding=6)
         
 
         # second layer
-        self.conv4 = nn.Conv2d(16, 8, kernel_size=9, stride=1, padding=4)
-        self.conv5 = nn.Conv2d(8, 8, kernel_size=9, stride=1, padding=4)
-        self.conv6 = nn.Conv2d(8, 8, kernel_size=9, stride=1, padding=4)
+        self.conv4 = nn.Conv2d(48, 8, kernel_size=5, padding=2)
+        #self.conv4 = nn.Conv2d(48, 24, kernel_size=5, padding=2)  # Assuming x2_1, x2_2, and x2_3 each have 8 channels
+        self.conv5 = nn.Conv2d(8, 8, kernel_size=9, padding=4)
+        self.conv6 = nn.Conv2d(8, 8, kernel_size=13, padding=6)
 
-        # third layer
-        self.conv7 = nn.Conv2d(8,8,kernel_size=5,stride=1,padding=2)
-        self.conv8 = nn.Conv2d(8,8,kernel_size=5,stride=1,padding=2)
-        self.conv9 = nn.Conv2d(8,8,kernel_size=5,stride=1,padding=2)
 
         #sub-pixel convolutional layer
-        self.conv10 = nn.Conv2d(8, 3 * self.upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
+        self.conv7 = nn.Conv2d(24, 3 * self.upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
+        self.pixel_shuffle = nn.PixelShuffle(self.upscale_factor)
+
+        
+
+
+        self._initialize_weights()
+
+    def forward(self, x):
+
+        #first layer
+        x1_1 = self.relu(self.conv1(x))
+        x1_2 = self.relu(self.conv2(x1_1))
+        x1_3 = self.relu(self.conv3(x1_2))
+        x1 = torch.cat((x1_1, x1_2, x1_3), dim=1)
+
+        #second layer
+        x2_1 = self.relu(self.conv4(x1))
+        x2_2 = self.relu(self.conv5(x2_1))
+        x2_3 = self.relu(self.conv6(x2_2))
+        x2 = torch.cat((x2_1, x2_2, x2_3), dim=1)
+
+        #pixel shuffle
+        x3 = self.pixel_shuffle(self.conv7(x2))
+    
+
+        return x3
+
+    def _initialize_weights(self):
+        init.orthogonal_(self.conv1.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv2.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv3.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv4.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv5.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv6.weight, init.calculate_gain('relu'))
+        init.orthogonal_(self.conv7.weight)
+
+"""
+    def __init__(self, upscale_factor):
+        super(Net, self).__init__()
+        self.upscale_factor = upscale_factor
+        self.relu = nn.ReLU()
+
+        # first layer
+        self.conv1 = nn.Conv2d(3, 16, kernel_size=5, padding=2) #padding = (kernelsize-1)/2 to ensure same resolution as input
+        self.conv2 = nn.Conv2d(16, 16, kernel_size=9, padding=4)
+        self.conv3 = nn.Conv2d(16, 16, kernel_size=13, padding=6)
+        
+
+        # second layer
+        self.conv4 = nn.Conv2d(16, 8, kernel_size=5, padding=2)
+        self.conv5 = nn.Conv2d(8, 8, kernel_size=9, padding=4)
+        self.conv6 = nn.Conv2d(8, 8, kernel_size=13, padding=6)
+
+
+        #sub-pixel convolutional layer
+        self.conv7 = nn.Conv2d(8, 3 * self.upscale_factor ** 2, (3, 3), (1, 1), (1, 1))
         self.pixel_shuffle = nn.PixelShuffle(self.upscale_factor)
 
         self._initialize_weights()
@@ -55,13 +109,9 @@ class Net(nn.Module):
         x = self.relu(self.conv5(x))
         x = self.relu(self.conv6(x))
 
-        # Third layer
+        # Third layer + Pixel shuffle 
         x = self.relu(self.conv7(x))
-        x = self.relu(self.conv8(x))
-        x = self.relu(self.conv9(x))
-
-        # Pixel shuffle
-        x = self.pixel_shuffle(self.conv10(x))
+        x = self.pixel_shuffle(self.conv6(x))
 
         return x
 
@@ -78,9 +128,9 @@ class Net(nn.Module):
         init.orthogonal_(self.conv9.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv10.weight)
 
-
+"""
 # Create an instance of the model
-#model = MultiScale(upscale_factor=2)
+model = Net(upscale_factor=2)
 
 # Print the model architecture
 #print(model)
