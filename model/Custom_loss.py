@@ -9,9 +9,9 @@ class div_loss(nn.Module):
 
 
     def calc_div(self, data):
-        x_grad_x, x_grad_y = torch.gradient(data[:, :, 0])
-        y_grad_x, y_grad_y = torch.gradient(data[:, :, 1])
-        z_grad_x, z_grad_y = torch.gradient(data[:, :, 2])
+        x_grad_x, x_grad_y = torch.gradient(data[:, 0, :, :], dim=(1, 2))
+        y_grad_x, y_grad_y = torch.gradient(data[:, 1, :, :], dim=(1, 2))
+        z_grad_x, z_grad_y = torch.gradient(data[:, 2, :, :], dim=(1, 2))
 
         divergence_x = x_grad_x + x_grad_y
         divergence_y = y_grad_x + y_grad_y

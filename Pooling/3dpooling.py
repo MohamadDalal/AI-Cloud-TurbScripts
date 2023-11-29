@@ -80,6 +80,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
         for j in range(pooled_array.shape[slice_axis]):
             start = pool_size[slice_axis]*j
             end = start + pool_size[slice_axis]
+            # Ask Marko about this
             np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", pooled_array.take(j, slice_axis))
             np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
         if loading_bar:

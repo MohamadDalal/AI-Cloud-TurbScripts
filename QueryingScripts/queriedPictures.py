@@ -10,12 +10,17 @@ if __name__ == "__main__":
                         help="Path of the csv file to use.")
     parser.add_argument("-o", "--output-path", type=str, default="IndicesToQuery.png",
                         help="Path to save image.")
-    parser.add_argument("--true-color", type=tuple, default=(255,255,0),
+    parser.add_argument("--true-color", nargs=3, default=[255,255,0],
                         help="Path to save image.")
-    parser.add_argument("--false-color", type=tuple, default=(128,128,128),
+    parser.add_argument("--false-color", nargs=3, default=[128,128,128],
                         help="Path to save image.")
     
     args = parser.parse_args()
+    print(args)
+    for i in range(3):
+        args.true_color[i] = int(args.true_color[i])
+        args.false_color[i] = int(args.false_color[i])
+
     df = pd.read_csv(args.csv_path)
     #img = np.zeros((2048, 4000, 3))
     img = np.full((2048, 4000,3), args.false_color)
@@ -24,13 +29,13 @@ if __name__ == "__main__":
         img[row["xStart"]:row["xEnd"], row["timestep"]] = args.true_color
 
     #Fig, ax = plt.subplots(figsize=(40,20))
-    Fig, ax = plt.subplots(figsize=(20,10))
+    Fig, ax = plt.subplots(figsize=(10,5))
     ax.imshow(img)
     ax.set_title("Queried data points across time and X axis")
     ax.set_xlabel("time")
     ax.set_ylabel("X axis")
     #Fig.show()
-    Fig.savefig(args.output_path, dpi=600)
+    Fig.savefig(args.output_path, dpi=400)
     plt.show()
 
 
