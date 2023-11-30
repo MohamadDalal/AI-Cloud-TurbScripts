@@ -23,7 +23,10 @@ def train(epoch):
         input, target = batch[0].to(device), batch[1].to(device)
         optimizer.zero_grad()
         output = model(input)
-        loss = criterion(output, target)
+        #loss = criterion(output, target)
+        MSE = criterion_mse(output, target)
+        DIV = criterion_div(output, target)
+        loss = 0.8*MSE + 0.2*DIV
         batch_mse = loss.item()
         epoch_loss += batch_mse
         loss.backward()
@@ -39,43 +42,26 @@ def train(epoch):
 def validate():
     avg_psnr = 0
     psnr_list = []
-    epoch_mse = 0
-    mse_list = []
+    epoch_loss = 0
+    loss_list = []
     with torch.no_grad():
         for batch in validation_data_loader:
             input, target = batch[0].to(device), batch[1].to(device)
 
             prediction = model(input)
-            mse = criterion(prediction, target)
-            batch_mse = mse.item()
-            epoch_mse += batch_mse
-            mse_list.append(batch_mse)
-            psnr = 10 * log10(1 / batch_mse)
+            #loss = criterion(output, target)
+            MSE = criterion_mse(output, target)
+            DIV = criterion_div(output, target)
+            loss = 0.8*MSE + 0.2*DIV
+            batch_loss = mse.item()
+            epoch_loss += batch_loss
+            loss_list.append(batch_loss)
+            psnr = 10 * log10(1 / batch_loss)
             avg_psnr += psnr
             psnr_list.append(psnr)
-    print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validation_data_loader)))
-    return epoch_mse, epoch_mse / len(validation_data_loader), mse_list, avg_psnr, avg_psnr / len(validation_data_loader), psnr_list
-
-def test():
-    avg_psnr = 0
-    psnr_list = []
-    epoch_mse = 0
-    mse_list = []
-    with torch.no_grad():
-        for batch in testing_data_loader:
-            input, target = batch[0].to(device), batch[1].to(device)
-
-            prediction = model(input)
-            mse = criterion(prediction, target)
-            batch_mse = mse.item()
-            epoch_mse += batch_mse
-            mse_list.append(batch_mse)
-            #mse_list.append(mse.detach())
-            psnr = 10 * log10(1 / batch_mse)
-            avg_psnr += psnr
-            psnr_list.append(psnr)
-    print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(testing_data_loader)))
-    return epoch_mse, epoch_mse / len(testing_data_loader), mse_list, avg_psnr, avg_psnr / len(testing_data_loader), psnr_list
+    print("===> Validation {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
+    #print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validation_data_loader)))
+    return epoch_loss, epoch_loss / len(validation_data_loader), loss_list, avg_psnr, avg_psnr / len(validation_data_loader), psnr_list
 
 
 def checkpoint(epoch):
@@ -91,18 +77,18 @@ def checkpoint(epoch):
     print("Checkpoint saved to {}".format(model_out_path))
 
 
-def log_seperate_epoch(epoch, mse, validation_mse, validation_psnr):
+def log_seperate_epoch(epoch, loss, validation_loss, validation_psnr):
     save_path = Path(join(logging_path, f"Epoch_{epoch}"))
     Path(save_path).mkdir(parents=True, exist_ok=True)
-    np.savetxt(f"{save_path}/mse.csv", mse)
-    np.savetxt(f"{save_path}/validation_mse.csv", validation_mse)
+    np.savetxt(f"{save_path}/loss.csv", loss)
+    np.savetxt(f"{save_path}/validation_loss.csv", validation_loss)
     np.savetxt(f"{save_path}/validation_psnr.csv", validation_psnr)
 
 def log_all():
-    np.savetxt(f"{logging_path}/mse.csv", all_mse)
-    np.savetxt(f"{logging_path}/avg_mse.csv", all_avg_mse)
-    np.savetxt(f"{logging_path}/validation_mse.csv", all_validation_mse)
-    np.savetxt(f"{logging_path}/validation_avg_mse.csv", all_validation_avg_mse)
+    np.savetxt(f"{logging_path}/loss.csv", all_loss)
+    np.savetxt(f"{logging_path}/avg_loss.csv", all_avg_loss)
+    np.savetxt(f"{logging_path}/validation_loss.csv", all_validation_loss)
+    np.savetxt(f"{logging_path}/validation_avg_loss.csv", all_validation_avg_loss)
     np.savetxt(f"{logging_path}/validation_psnr.csv", all_validation_psnr)
     np.savetxt(f"{logging_path}/validation_avg_psnr.csv", all_validation_avg_psnr)
 
@@ -126,13 +112,13 @@ train_set = get_training_set()
 validation_set = get_validation_set()
 test_set = get_test_set()
 
-training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
+training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=True)
 validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 logging_path = join(getcwd(), "training_logs")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
-all_mse, all_avg_mse, all_validation_mse, all_validation_avg_mse, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
+all_loss, all_avg_loss, all_validation_loss, all_validation_avg_loss, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
 
 
 print('===> Building model')
@@ -149,19 +135,20 @@ else:
     model = Net(upscale_factor=32).to(device)
 """
 model = Net(upscale_factor=8).to(device)
-#criterion = nn.MSELoss()
-#criterion = nn.L1Loss()
-criterion = div_loss()
+criterion_mse = nn.MSELoss()
+criterion_mae = nn.L1Loss()
+criterion_div = div_loss()
+#criterion = criterion_mse
 
 optimizer = optim.Adam(model.parameters(), lr=0.0001)
 if START_EPOCH > 0:
     checkpoint_dict = torch.load(CHECKPOINT_PATH)
     model.load_state_dict(checkpoint_dict["model_state_dict"])
     optimizer.load_state_dict(checkpoint_dict["optimizer_state_dict"])
-    all_mse = [0 for _ in range(START_EPOCH)]
-    all_avg_mse = [0 for _ in range(START_EPOCH)]
-    all_validation_mse = [0 for _ in range(START_EPOCH)]
-    all_validation_avg_mse = [0 for _ in range(START_EPOCH)]
+    all_loss = [0 for _ in range(START_EPOCH)]
+    all_avg_loss = [0 for _ in range(START_EPOCH)]
+    all_validation_loss = [0 for _ in range(START_EPOCH)]
+    all_validation_avg_loss = [0 for _ in range(START_EPOCH)]
     all_validation_psnr = [0 for _ in range(START_EPOCH)]
     all_validation_avg_psnr = [0 for _ in range(START_EPOCH)]
 
@@ -170,23 +157,23 @@ for epoch in range(START_EPOCH + 1, EPOCHS + 1):
     model.train()
     mse, avg_mse, iter_mse = train(epoch)
     model.eval()
-    validation_mse, validation_avg_mse, validation_iter_mse, validation_psnr, validation_avg_psnr, validation_iter_psnr = validate()
+    validation_loss, validation_avg_loss, validation_iter_loss, validation_psnr, validation_avg_psnr, validation_iter_psnr = validate()
     checkpoint(epoch)
     end_time = perf_counter()
     print(f"Epoch {epoch} took {end_time-start_time}s")
-    all_mse.append(mse)
-    all_avg_mse.append(avg_mse)
-    all_validation_mse.append(validation_mse)
-    all_validation_avg_mse.append(validation_avg_mse)
+    all_loss.append(mse)
+    all_avg_loss.append(avg_mse)
+    all_validation_loss.append(validation_loss)
+    all_validation_avg_loss.append(validation_avg_loss)
     all_validation_psnr.append(validation_psnr)
     all_validation_avg_psnr.append(validation_avg_psnr)
-    log_seperate_epoch(epoch, iter_mse, validation_iter_mse, validation_iter_psnr)
+    log_seperate_epoch(epoch, iter_mse, validation_iter_loss, validation_iter_psnr)
 
 for i in range(START_EPOCH):
-    all_mse[i] = (all_mse[START_EPOCH])
-    all_avg_mse[i] = (all_avg_mse[START_EPOCH])
-    all_validation_mse[i] = (all_validation_mse[START_EPOCH])
-    all_validation_avg_mse[i] = (all_validation_avg_mse[START_EPOCH])
+    all_loss[i] = (all_loss[START_EPOCH])
+    all_avg_loss[i] = (all_avg_loss[START_EPOCH])
+    all_validation_loss[i] = (all_validation_loss[START_EPOCH])
+    all_validation_avg_loss[i] = (all_validation_avg_loss[START_EPOCH])
     all_validation_psnr[i] = (all_validation_psnr[START_EPOCH])
     all_validation_avg_psnr[i] = (all_validation_avg_psnr[START_EPOCH])
 
