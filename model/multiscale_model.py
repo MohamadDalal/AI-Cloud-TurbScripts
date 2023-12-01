@@ -47,7 +47,7 @@ class Net(nn.Module):
         # self.pixel_shuffle = nn.PixelShuffle(self.upscale_factor)
 
         # 4
-        self.convs8 = nn.Conv2d(3, 32, kernel_size=3, padding=1)
+        self.convs8 = nn.Conv2d(35, 32, kernel_size=3, padding=1)
         self.convs9 = nn.Conv2d(32, 32, kernel_size=3, padding=1)
 
         # first layer
