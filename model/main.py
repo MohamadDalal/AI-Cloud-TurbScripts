@@ -8,8 +8,9 @@ from torch.utils.data import DataLoader
 from os.path import join
 from os import getcwd
 from pathlib import Path
-from model import Net
+#from model import Net
 #from model2 import Net
+from multiscale_model import Net
 from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,10 +24,10 @@ def train(epoch):
         input, target = batch[0].to(device), batch[1].to(device)
         optimizer.zero_grad()
         output = model(input)
-        #loss = criterion(output, target)
-        MSE = criterion_mse(output, target)
-        DIV = criterion_div(output, target)
-        loss = 0.8*MSE + 0.2*DIV
+        loss = criterion(output, target)
+        #MSE = criterion_mse(output, target)
+        #DIV = criterion_div(output, target)
+        #loss = WEIGHT*MSE + (1-WEIGHT)*DIV
         batch_mse = loss.item()
         epoch_loss += batch_mse
         loss.backward()
@@ -49,11 +50,11 @@ def validate():
             input, target = batch[0].to(device), batch[1].to(device)
 
             prediction = model(input)
-            #loss = criterion(output, target)
-            MSE = criterion_mse(output, target)
-            DIV = criterion_div(output, target)
-            loss = 0.8*MSE + 0.2*DIV
-            batch_loss = mse.item()
+            loss = criterion(prediction, target)
+            #MSE = criterion_mse(prediction, target)
+            #DIV = criterion_div(prediction, target)
+            #loss = WEIGHT*MSE + (1-WEIGHT)*DIV
+            batch_loss = loss.item()
             epoch_loss += batch_loss
             loss_list.append(batch_loss)
             psnr = 10 * log10(1 / batch_loss)
@@ -65,6 +66,7 @@ def validate():
 
 
 def checkpoint(epoch):
+    #model_out_dir = join(getcwd(), f"model_checkpoints_mixedLoss{WEIGHT}")
     model_out_dir = join(getcwd(), "model_checkpoints")
     Path(model_out_dir).mkdir(parents=True, exist_ok=True)
     model_out_path = "{}/model_epoch_{}.pth".format(model_out_dir, epoch)
@@ -102,6 +104,7 @@ BATCH_SIZE = 128
 EPOCHS = 30
 START_EPOCH = 0
 CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
+WEIGHT = 0.99
 
 print('===> Loading datasets')
 train_set_dir = join(getcwd(), "data", "all_data", "train")
@@ -112,10 +115,11 @@ train_set = get_training_set()
 validation_set = get_validation_set()
 test_set = get_test_set()
 
-training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=True)
+training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
+#logging_path = join(getcwd(), f"training_logs_mixedLoss{WEIGHT}")
 logging_path = join(getcwd(), "training_logs")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
 all_loss, all_avg_loss, all_validation_loss, all_validation_avg_loss, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
@@ -138,7 +142,7 @@ model = Net(upscale_factor=8).to(device)
 criterion_mse = nn.MSELoss()
 criterion_mae = nn.L1Loss()
 criterion_div = div_loss()
-#criterion = criterion_mse
+criterion = criterion_mse
 
 optimizer = optim.Adam(model.parameters(), lr=0.0001)
 if START_EPOCH > 0:
