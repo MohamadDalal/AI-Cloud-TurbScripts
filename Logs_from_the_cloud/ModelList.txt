@@ -1,0 +1,40 @@
+Date,                   model,      batch, epochs, loss, learning rate, notes
+Monday-20-11-2023:      Old_Model,  B128, E50, MSE, L0.001,     No test split, 75-25 splits
+Tuesday-21-11-2023:     Old_Model,  B128, E20, MSE, L0.001,     Now with test split, 70-20-10 splits
+Wednesday-22-11-2023:   Old_Model,  B128, E30, MSE, L0.001,     Now with dictionary checkpoint saving
+Wednesday-22-11-2023-2: Old_Model,  B128, E30, MSE, L0.0001,    Starts from epoch 10 in Wednesday-22-11-2023 with new learning rate
+Wednesday-22-11-2023-3: Old_Model,  B128, E10, MSE, L0.0001,
+Thursday-23-11-2023:    Model2,     B128, E30, MSE, L0.001,     Trying more dense model. Did not do much.
+Thursday-23-11-2023-2:  Old_Model,  B128, E15, MAE, L0.0001,    Trying MAE
+Friday-24-11-2023:      Old_Model,  B128, E30, MSE, L0.0001,    Fixed blurring to not use random standard deviation. Fixed resizing, now resizes input to 48x16 instead of labels to 1368x512
+Friday-24-11-2023-2:    Old_Model,  B128, E30, MSE, L0.001,
+Wednesday-29-11-2023:   New_Model,  B128, E30, MSE, L0.0001,    First draft handed in. Trying model with differen convolutional kernels. Data is now 192x64 blurred 10 times
+Wednesday-29-11-2023-2: New_Model,  B128, E30, MAE, L0.0001,
+Wednesday-29-11-2023-3: New_Model,  B128, E30, DIV, L0.0001,    Trying divergence loss.
+Thursday-30-11-2023:    MS_Model,   B128, E30, MSE, L0.0001,    First multi scale model. Does not have DSC
+Thursday-30-11-2023-2:  ESPCN,      B128, E30, MSE, L0.0001,    Trying model from the internet https://github.com/anujdutt9/ESPCN/blob/main/model.py
+Thursday-30-11-2023-3:  New_Model,  B128, E30, MSE, L0.0001,    Shuffle on for training data loader
+Friday-01-12-2023:      New_Model,  B128, E30, MIX, L0.0001,    0.9 MSE weight. Shuffle on
+Friday-01-12-2023-2:    New_Model,  B128, E30, MIX, L0.0001,    0.99 MSE weight. Shuffle on
+Friday-01-12-2023-3:    New_Model,  B128, E30, MIX, L0.0001,    0.999 MSE weight. Shuffle on
+Friday-01-12-2023-4:    New_Model,  B128, E30, MIX, L0.0001,    0.9999 MSE weight. Shuffle on
+Friday-01-12-2023-5:    New_Model,  B128, E30, MIX, L0.0001,    0.99999 MSE weight. Shuffle on
+Friday-01-12-2023-6:    DSC/MS,     B128, E30, MSE, L0.0001,    First time using DSC/MS. Shuffle on
+Friday-01-12-2023-7:    DSC/MS,     B128, E30, MSE, L0.0001,    First time using DSC/MS. Shuffle off
+Saturday-02-12-2023:    DSC/MS,     B128, E30, MIX, L0.0001,    0.99 MSE weight. Shuffle off
+Monday-04-12-2023:      DSC/MS,     B128, E30, MSE, L0.0001,    Non-blurred 192x64 data. Shuffle on
+Monday-04-12-2023-2:    DSC/MS,     B128, E30, MSE, L0.0001,    Non-blurred 49x16 data resized to 192x64. Shuffle on
+Monday-04-12-2023-3:    DSC/MS,     B128, E30, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on
+Tuesday-05-12-2023:     DSC/MS,     B128, E60, MSE, L0.0001,    Starts from epoch 30 from Monday-04-12-2023-3
+Tuesday-05-12-2023-2:   New_Model,  B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on
+Wednesday-06-12-2023:   New_Model,  B128, E120, MSE, L0.0001,   Starts from epoch 60 from Tuesday-05-12-2023-2
+Wednesday-06-12-2023-2: DSC/MS,     B128, E120, MSE, L0.0001,   Starts from epoch 60 from Tuesday-05-12-2023
+Wednesday-06-12-2023-3: DSC/MS-32,  B128, E30, MSE, L0.0001,    DSC/MS model with scaling factor 32. Blurred 49x16 data not resized to 192x64. Shuffle on
+Wednesday-06-12-2023-4: Old_Model,  B128, E30, MSE, L0.0001,    Old model with scaling factor 32. Blurred 49x16 data not resized to 192x64. Shuffle on
+Wednesday-06-12-2023-5: New_Model,  B128, E30, MSE, L0.0001,    New model with scaling factor 32. Blurred 49x16 data not resized to 192x64. Shuffle on
+Thursday-07-12-2023:    New_Model,  B128, E60, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on
+Thursday-07-12-2023-2:  DSC/MS,     B128, E60, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on
+Thursday-07-12-2023-3:  Old_Model,  B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on
+Thursday-07-12-2023-4:  New_Model,  B128, E120, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-4
+Thursday-07-12-2023-5:  DSC/MS,     B128, E120, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-5
+Thursday-07-12-2023-6:  Old_Model,  B128, E120, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-6

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.init as init
+from torchinfo import summary
 
 
 class Net(nn.Module):
@@ -35,3 +36,10 @@ class Net(nn.Module):
         init.orthogonal_(self.conv2.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv3.weight, init.calculate_gain('relu'))
         init.orthogonal_(self.conv4.weight)
+
+if __name__ == "__main__":
+    # Create an instance of the model
+    model = Net(upscale_factor=8)
+
+    # Print the model architecture
+    print(summary(model, (1,3,192,64)))

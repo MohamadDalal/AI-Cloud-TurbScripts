@@ -1,0 +1,11 @@
+Batch size 128
+Epochs 120
+Starts from epoch 60 from Tuesday-05-12-2023-2
+70-20-10 train, validation, test split
+ADAM Optimizer with constant learning rate of 0.0001
+MSE Loss
+Shuffle on for training DataLoader
+Pytorch SR model with modified kernels (Model 1)
+Blurred 49x16 data resized to 192x168
+
+

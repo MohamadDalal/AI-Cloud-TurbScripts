@@ -1,0 +1,10 @@
+Batch size 128
+Epochs 60
+70-20-10 train, validation, test split
+ADAM Optimizer with constant learning rate of 0.0001
+MSE Loss
+Shuffle on for training DataLoader
+Pytorch SR model without modified kernels (Old_Model)
+Blurred 49x16 data resized to 192x168
+
+

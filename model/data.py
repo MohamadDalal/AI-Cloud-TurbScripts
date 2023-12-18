@@ -34,9 +34,10 @@ data
 def input_transform():
     return Compose([
         ToTensor(),
-        #GaussianBlur(9, 1),
+        GaussianBlur(9, 1),
         #Resize((49,16), antialias=True),
         #Resize((48,16), antialias=True),
+        Resize((192, 48), antialias=False),
     ])
 
 

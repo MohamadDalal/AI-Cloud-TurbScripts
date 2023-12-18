@@ -1,0 +1,9 @@
+Batch size 128
+Epochs 30
+70-20-10 train, validation, test split
+ADAM Optimizer with constant learning rate of 0.0001
+0.99*MSE + 0.01*Div Loss
+Shuffle off for training DataLoader
+Full DSC/MS model with paper with pixle shuffle at the end
+
+

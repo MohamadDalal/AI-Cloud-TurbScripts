@@ -7,9 +7,16 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import pandas as pd
-from model import Net
+#from model import Net
+from multiscale_model import Net
+#from ESPCN_model import Net
+#from old_model import Net
+from math import log10
+from torch.nn import MSELoss
 from torch.nn.functional import interpolate
 
+# Command I always use to run
+# python super_resolve4.py data/all_data/test/data/T622-X1010-S32-A09.npy ../Logs_from_the_cloud/Thursday-30-11-2023/model_checkpoints/model_epoch_30.pth MSC_Model_First.png
 
 # Training settings
 parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
@@ -37,8 +44,10 @@ model.eval()
 img_to_tensor = Compose([
         ToTensor(),
         GaussianBlur(9, 1),
-        Resize((48,16), antialias=True),
+        #Resize((48,16), antialias=True),
+        Resize((192,64), antialias=False),        
     ])
+label_to_tensor = Compose([ToTensor()])
 input = img_to_tensor(img).to(device)
 input.unsqueeze_(0)
 print(input.shape)
@@ -67,39 +76,67 @@ label_dir = os.path.join(os.getcwd(), "data", "all_data", "test", "labels", f"{d
 label = np.load(label_dir)
 
 
-model_mse = pd.read_csv(f"test_logs/M1-B128-E30-L001-FixedResize-FixedGaussian-FixedDataloader/test_mse.csv")
-model_psnr = pd.read_csv(f"test_logs/M1-B128-E30-L001-FixedResize-FixedGaussian-FixedDataloader/test_psnr.csv")
-bicubic_mse = pd.read_csv(f"test_logs/Bicubic-FixedDataloader/test_mse.csv")
-bicubic_psnr = pd.read_csv(f"test_logs/Bicubic-FixedDataloader/test_psnr.csv")
+#model_mse = pd.read_csv(f"test_logs/M1-B128-E30-L001-FixedResize-FixedGaussian-FixedDataloader/test_mse.csv")
+#model_psnr = pd.read_csv(f"test_logs/M1-B128-E30-L001-FixedResize-FixedGaussian-FixedDataloader/test_psnr.csv")
+#bicubic_mse = pd.read_csv(f"test_logs/Bicubic-FixedDataloader/test_mse.csv")
+#bicubic_psnr = pd.read_csv(f"test_logs/Bicubic-FixedDataloader/test_psnr.csv")
+critereon_MSE = MSELoss()
+print(torch.permute(out, (2,0,1)).shape)
+model_mse = critereon_MSE(torch.permute(out, (2,0,1)), label_to_tensor(label[...,1,:]))
+model_mse = model_mse.item()
+#model_psnr = psnr = 10 * log10(1 / model_mse)
+#model_psnr = psnr = 20 * log10(torch.max(out) / np.sqrt(model_mse))
+model_psnr = psnr = 20 * log10(np.max(label) / np.sqrt(model_mse))
+bicubic_mse = critereon_MSE(torch.permute(out2, (2,0,1)), label_to_tensor(label[...,1,:]))
+bicubic_mse = bicubic_mse.item()
+#bicubic_psnr = psnr = 10 * log10(1 / bicubic_mse)
+#bicubic_psnr = psnr = 20 * log10(torch.max(out2) / np.sqrt(bicubic_mse))
+bicubic_psnr = psnr = 20 * log10(np.max(label) / np.sqrt(bicubic_mse))
 #print("{:.5f}".format(model_mse[model_mse.iloc[:,0] == data].values[0][1]))
 #exit()
 
+# max_Val = max(np.max(np.mean(input[0].numpy()**2, axis=0)),
+#               np.max(np.mean(out2_img_y**2, axis=2)),
+#               np.max(np.mean(out_img_y**2, axis=2)),
+#               np.max(np.mean(label[...,1,:]**2, axis=2)))
+# min_Val = min(np.min(np.mean(input[0].numpy()**2, axis=0)),
+#               np.min(np.mean(out2_img_y**2, axis=2)),
+#               np.min(np.mean(out_img_y**2, axis=2)),
+#               np.min(np.mean(label[...,1,:]**2, axis=2)))
+max_Val = np.max(np.sum(label[...,1,:]**2, axis=2))
+min_Val = np.min(np.sum(label[...,1,:]**2, axis=2))
+print(min_Val, max_Val)
+
 fig, axes = plt.subplots(1,4)
 print(input.numpy().shape)
-axes[0].imshow(np.mean(input[0].numpy(), axis=0))
+axes[0].imshow(np.sum(input[0].numpy()**2, axis=0), vmin=min_Val, vmax=max_Val)
 axes[0].axis("off")
 axes[0].set_title("Input image")
-axes[1].imshow(np.mean(out2_img_y, axis=2))
+axes[1].imshow(np.sum(out2_img_y**2, axis=2), vmin=min_Val, vmax=max_Val)
 axes[1].axis("off")
 axes[1].set_title("Bicubic output")
-axes[2].imshow(np.mean(out_img_y, axis=2))
+axes[2].imshow(np.sum(out_img_y**2, axis=2), vmin=min_Val, vmax=max_Val)
 axes[2].axis("off")
 axes[2].set_title("Model output")
-axes[3].imshow(np.mean(label[...,1,:], axis=2))
+axes[3].imshow(np.sum(label[...,1,:]**2, axis=2), vmin=min_Val, vmax=max_Val)
 axes[3].axis("off")
 axes[3].set_title("DNS (reference)")
 # Automate metrics retrieval if needed
 fig.text(0.21, 0.1, "MSE", wrap=True, horizontalalignment='center', fontsize=12)
-text = "{:.5f}".format(bicubic_mse[bicubic_mse.iloc[:,0] == data].values[0][1])
+#text = "{:.5f}".format(bicubic_mse[bicubic_mse.iloc[:,0] == data].values[0][1])
+text = "{:.5f}".format(bicubic_mse)
 #text = round(bicubic_mse[bicubic_mse.iloc[:,0] == data].values[0][1], 5)
 #print(text)
 fig.text(0.41, 0.1, text, wrap=True, horizontalalignment='center', fontsize=12)
-text = "{:.5f}".format(model_mse[model_mse.iloc[:,0] == data].values[0][1])
+#text = "{:.5f}".format(model_mse[model_mse.iloc[:,0] == data].values[0][1])
+text = "{:.5f}".format(model_mse)
 fig.text(0.61, 0.1, text, wrap=True, horizontalalignment='center', fontsize=12)
 fig.text(0.21, 0.05, "PSNR", wrap=True, horizontalalignment='center', fontsize=12)
-text = "{:.5f}".format(bicubic_psnr[bicubic_psnr.iloc[:,0] == data].values[0][1])
+#text = "{:.5f}".format(bicubic_psnr[bicubic_psnr.iloc[:,0] == data].values[0][1])
+text = "{:.5f}".format(bicubic_psnr)
 fig.text(0.41, 0.05, text, wrap=True, horizontalalignment='center', fontsize=12)
-text = "{:.5f}".format(model_psnr[model_psnr.iloc[:,0] == data].values[0][1])
+#text = "{:.5f}".format(model_psnr[model_psnr.iloc[:,0] == data].values[0][1])
+text = "{:.5f}".format(model_psnr)
 fig.text(0.61, 0.05, text, wrap=True, horizontalalignment='center', fontsize=12)
 fig.savefig(opt.output_filename, dpi=400, bbox_inches='tight')
 

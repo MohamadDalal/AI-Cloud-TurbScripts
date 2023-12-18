@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.init as init
+from torchinfo import summary
 
 """First, we extend the CNN model by introducing compression and
 skipped connections, as shown in the red box of figure 3(c). In super-resolution analysis,
@@ -192,8 +193,10 @@ class Net(nn.Module):
         init.orthogonal_(self.conv10.weight)
 
 """
-# Create an instance of the model
-model = Net(upscale_factor=2)
 
-# Print the model architecture
-#print(model)
+if __name__ == "__main__":
+    # Create an instance of the model
+    model = Net(upscale_factor=8)
+
+    # Print the model architecture
+    print(summary(model, (1,3,192,64)))

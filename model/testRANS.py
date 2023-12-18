@@ -2,12 +2,14 @@ from __future__ import print_function
 import argparse
 import torch
 from PIL import Image
-from torchvision.transforms import Compose, ToTensor, Resize, GaussianBlur
+from torchvision.transforms import Compose, ToTensor, Resize, GaussianBlur, InterpolationMode
 import matplotlib.pyplot as plt
 import os
 import numpy as np
 import pandas as pd
-from old_model import Net
+#from old_model import Net
+from multiscale_model import Net
+#from model import Net
 
 
 def is_array_file(filename):
@@ -15,7 +17,7 @@ def is_array_file(filename):
 
 img_to_tensor = Compose([
         ToTensor(),
-        #Resize((48,16), antialias=True),
+        Resize((152,104), interpolation=InterpolationMode.BILINEAR),
     ])
 
 parser = argparse.ArgumentParser(description='PyTorch Super Res Example')
@@ -30,7 +32,7 @@ else:
     device = torch.device("cpu")
 
 checkpoint_dict = torch.load(opt.model, map_location=torch.device("cpu"))
-model = Net(upscale_factor=32).to(device)
+model = Net(upscale_factor=8).to(device)
 model.load_state_dict(checkpoint_dict["model_state_dict"])
 #model = torch.load(opt.model)
 model.eval()
@@ -40,6 +42,8 @@ data_dir = "data_RANS"
 image_filenames = [x for x in sorted(os.listdir(data_dir)) if is_array_file(x)]
 
 for i, x in enumerate(image_filenames):
+    if i>0:
+        break
     img = np.load(f"{data_dir}/{x}")[...,4:]
     img = np.float32(img)
     print(img.shape)
@@ -49,6 +53,7 @@ for i, x in enumerate(image_filenames):
     print(input.shape)
 
     out = model(input)
+    #out = input
     out = out.cpu()
     out = out[0]
     #out_img_y = out[0].detach().numpy()

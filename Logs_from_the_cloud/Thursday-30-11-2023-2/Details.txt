@@ -3,6 +3,6 @@ Epochs 30
 70-20-10 train, validation, test split
 ADAM Optimizer with constant learning rate of 0.0001
 MSE Loss
-ESPCN model from the internet
+ESPCN model from the internet https://github.com/anujdutt9/ESPCN/blob/main/model.py
 
 

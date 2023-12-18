@@ -1,0 +1,20 @@
+MSE
+	Modified
+Simple SR: 0.002165899844840169
+	DSC\MS with
+Pixle Shuffle: 0.001937678549438715
+PSNR
+	Modified
+Simple SR: 28.912890364069106
+	DSC\MS with
+Pixle Shuffle: 29.396456750449822
+MAE
+	Modified
+Simple SR: 0.03228648006916046
+	DSC\MS with
+Pixle Shuffle: 0.029968751594424248
+DIV
+	Modified
+Simple SR: 2.41666316986084
+	DSC\MS with
+Pixle Shuffle: 5.101762771606445

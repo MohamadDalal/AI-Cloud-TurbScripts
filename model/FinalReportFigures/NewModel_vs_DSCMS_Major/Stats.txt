@@ -1,0 +1,28 @@
+MSE
+	Bicubic
+Interpolation: 0.01093187928199768
+	Modified
+Simple SR: 0.002253993647173047
+	DSC\MS with
+Pixle Shuffle: 0.0022726699244230986
+PSNR
+	Bicubic
+Interpolation: 21.88232579349433
+	Modified
+Simple SR: 28.739747189282006
+	DSC\MS with
+Pixle Shuffle: 28.70391041878801
+MAE
+	Bicubic
+Interpolation: 0.05364716798067093
+	Modified
+Simple SR: 0.03266334533691406
+	DSC\MS with
+Pixle Shuffle: 0.033105626702308655
+DIV
+	Bicubic
+Interpolation: 87.52960968017578
+	Modified
+Simple SR: 6.71738862991333
+	DSC\MS with
+Pixle Shuffle: 6.151947498321533
