@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.init as init
-from torchinfo import summary
+#from torchinfo import summary
 
 
 class Net(nn.Module):
@@ -42,4 +42,4 @@ if __name__ == "__main__":
     model = Net(upscale_factor=8)
 
     # Print the model architecture
-    print(summary(model, (1,3,192,64)))
+    #print(summary(model, (1,3,192,64)))
