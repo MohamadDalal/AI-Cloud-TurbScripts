@@ -58,9 +58,11 @@ def validate():
             input, target = batch[0].to(device), batch[1].to(device)
             for i in range(input.shape[1]):
                 input[:,i,...] = (input[:,i,...]-normalizationStatistics[0,i])/normalizationStatistics[1,i]
+            for i in range(input.shape[1]):
+                target[:,i,...] = (target[:,i,...]-normalizationStatistics2[0,i])/normalizationStatistics2[1,i]
             prediction = model(input)
-            for i in range(prediction.shape[1]):
-                prediction[:,i,...] = normalizationStatistics[1,i]*prediction[:,i,...]+normalizationStatistics[0,i]
+            #for i in range(prediction.shape[1]):
+            #    prediction[:,i,...] = normalizationStatistics[1,i]*prediction[:,i,...]+normalizationStatistics[0,i]
             loss = criterion(prediction, target)
             #MSE = criterion_mse(prediction, target)
             #DIV = criterion_div(prediction, target)
@@ -78,7 +80,7 @@ def validate():
 
 def checkpoint(epoch):
     #model_out_dir = join(getcwd(), f"model_checkpoints_mixedLoss{WEIGHT}")
-    model_out_dir = join(getcwd(), "model_checkpoints_trainset_normalization")
+    model_out_dir = join(getcwd(), "model_checkpoints_trainset_normalization2")
     Path(model_out_dir).mkdir(parents=True, exist_ok=True)
     model_out_path = "{}/model_epoch_{}.pth".format(model_out_dir, epoch)
     #torch.save(model, model_out_path)
@@ -136,7 +138,7 @@ validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 #logging_path = join(getcwd(), f"training_logs_mixedLoss{WEIGHT}")
-logging_path = join(getcwd(), "training_logs_trainset_normalization")
+logging_path = join(getcwd(), "training_logs_trainset_normalization2")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
 all_loss, all_avg_loss, all_validation_loss, all_validation_avg_loss, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
 

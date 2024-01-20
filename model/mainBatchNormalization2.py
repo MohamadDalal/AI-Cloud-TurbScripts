@@ -92,7 +92,7 @@ def validate():
 
 def checkpoint(epoch):
     #model_out_dir = join(getcwd(), f"model_checkpoints_mixedLoss{WEIGHT}")
-    model_out_dir = join(getcwd(), "model_checkpoints_batch_normalization")
+    model_out_dir = join(getcwd(), "model_checkpoints_batch_normalization2")
     Path(model_out_dir).mkdir(parents=True, exist_ok=True)
     model_out_path = "{}/model_epoch_{}.pth".format(model_out_dir, epoch)
     #torch.save(model, model_out_path)
@@ -145,7 +145,7 @@ validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 #logging_path = join(getcwd(), f"training_logs_mixedLoss{WEIGHT}")
-logging_path = join(getcwd(), "training_logs_batch_normalization")
+logging_path = join(getcwd(), "training_logs_batch_normalization2")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
 all_loss, all_avg_loss, all_validation_loss, all_validation_avg_loss, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
 
