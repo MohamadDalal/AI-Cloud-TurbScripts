@@ -38,3 +38,11 @@ Thursday-07-12-2023-3:  Old_Model,  B128, E60, MSE, L0.0001,    Blurred 49x16 da
 Thursday-07-12-2023-4:  New_Model,  B128, E120, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-4
 Thursday-07-12-2023-5:  DSC/MS,     B128, E120, MAE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-5
 Thursday-07-12-2023-6:  Old_Model,  B128, E120, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle on. Starts from epoch 60 from Thursday-07-12-2023-6
+Friday-19-01-2024:      DSC/MS,     B128, E45, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Batch Normalization. Stopped midway to fix validation dataset (wrong data size).
+Saturday-20-01-2024:    DSC/MS,     B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Trainset Normalization.
+Saturday-20-01-2024-2:  DSC/MS,     B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Batch Normalization.
+Sunday-21-01-2024:      DSC/MS,     B128, E120, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Trainset Normalization. Starts from epoch 60 from Saturday-20-01-2024.
+Sunday-21-01-2024-2:    DSC/MS,     B128, E120, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Batch Normalization. Starts from epoch 60 from Saturday-20-01-2024-2.
+Sunday-21-01-2024-3:    DSC/MS,     B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Trainset Normalization2.
+Sunday-21-01-2024-4:    DSC/MS,     B128, E60, MSE, L0.0001,    Blurred 49x16 data resized to 192x64. Shuffle off. Batch Normalization2.
+Monday-22-01-2024:      DSC/MS,     B128, E120, MSE, L0.0001,    Blurred 48x16 data resized to 192x64. Shuffle off. Tests using 3x32x32 max pool kernel instead.
