@@ -109,13 +109,13 @@ if torch.cuda.is_available():
 else:
     device = torch.device("cpu")
 
-BATCH_SIZE = 100
-EPOCHS = 1
-START_EPOCH = 0
-CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
+BATCH_SIZE = 128
+EPOCHS = 120
+START_EPOCH = 60
+CHECKPOINT_PATH = f"model_checkpoints_trainset_normalization/model_epoch_{START_EPOCH}.pth"
 WEIGHT = 0.99
 
-normalizationStatistics = np.load("calcMeanVar/separatedStatistics2.npy")
+normalizationStatistics = np.load("calcMeanVar/separatedStatistics.npy")
 normalizationStatistics[1,:] = np.sqrt(normalizationStatistics[1,:])
 
 print('===> Loading datasets')

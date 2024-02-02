@@ -126,9 +126,9 @@ else:
     device = torch.device("cpu")
 
 BATCH_SIZE = 128
-EPOCHS = 60
-START_EPOCH = 0
-CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
+EPOCHS = 120
+START_EPOCH = 60
+CHECKPOINT_PATH = f"model_checkpoints_batch_normalization2/model_epoch_{START_EPOCH}.pth"
 WEIGHT = 0.99
 
 print('===> Loading datasets')

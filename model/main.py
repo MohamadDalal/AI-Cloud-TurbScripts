@@ -11,6 +11,7 @@ from pathlib import Path
 #from model import Net
 #from model2 import Net
 from multiscale_model import Net
+#from old_model import Net
 from data import get_training_set, get_validation_set, get_test_set
 import numpy as np
 import matplotlib.pyplot as plt
@@ -60,14 +61,14 @@ def validate():
             psnr = 10 * log10(1 / batch_loss)
             avg_psnr += psnr
             psnr_list.append(psnr)
-    print("===> Validation {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(training_data_loader)))
+    print("===> Validation {} Complete: Avg. Loss: {:.4f}".format(epoch, epoch_loss / len(validation_data_loader)))
     #print("===> Avg. PSNR: {:.4f} dB".format(avg_psnr / len(validation_data_loader)))
     return epoch_loss, epoch_loss / len(validation_data_loader), loss_list, avg_psnr, avg_psnr / len(validation_data_loader), psnr_list
 
 
 def checkpoint(epoch):
     #model_out_dir = join(getcwd(), f"model_checkpoints_mixedLoss{WEIGHT}")
-    model_out_dir = join(getcwd(), "model_checkpoints")
+    model_out_dir = join(getcwd(), "model_checkpoints_48x16Data")
     Path(model_out_dir).mkdir(parents=True, exist_ok=True)
     model_out_path = "{}/model_epoch_{}.pth".format(model_out_dir, epoch)
     #torch.save(model, model_out_path)
@@ -103,7 +104,7 @@ else:
 BATCH_SIZE = 128
 EPOCHS = 30
 START_EPOCH = 0
-CHECKPOINT_PATH = f"model_checkpoints/model_epoch_{START_EPOCH}.pth"
+CHECKPOINT_PATH = f"model_checkpoints_smallDataResizeOldModel/model_epoch_{START_EPOCH}.pth"
 WEIGHT = 0.99
 
 print('===> Loading datasets')
@@ -115,12 +116,12 @@ train_set = get_training_set()
 validation_set = get_validation_set()
 test_set = get_test_set()
 
-training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
+training_data_loader = DataLoader(dataset=train_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=True)
 validation_data_loader = DataLoader(dataset=validation_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 testing_data_loader = DataLoader(dataset=test_set, num_workers=4, batch_size=BATCH_SIZE, shuffle=False)
 
 #logging_path = join(getcwd(), f"training_logs_mixedLoss{WEIGHT}")
-logging_path = join(getcwd(), "training_logs")
+logging_path = join(getcwd(), "training_logs_48x16Data")
 Path(logging_path).mkdir(parents=True, exist_ok=True)
 all_loss, all_avg_loss, all_validation_loss, all_validation_avg_loss, all_validation_psnr, all_validation_avg_psnr = [], [], [], [], [] ,[]
 

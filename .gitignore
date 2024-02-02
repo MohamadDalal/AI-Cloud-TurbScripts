@@ -23,4 +23,5 @@ model/data/all_data/validaiton
 model/data/all_data/test
 model/data/all_data/train
 model/test_logs/FinalReportTests/Disregard
+model/training_logs*
 model/*png

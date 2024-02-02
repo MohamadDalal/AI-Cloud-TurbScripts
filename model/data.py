@@ -37,7 +37,7 @@ def input_transform():
         GaussianBlur(9, 1),
         #Resize((49,16), antialias=True),
         #Resize((48,16), antialias=True),
-        Resize((192, 48), antialias=False),
+        Resize((192, 64), antialias=False),
     ])
 
 
@@ -49,7 +49,7 @@ def target_transform():
 
 # Not used
 def train_test_split(train_ratio=0.8):
-    root_dir = join(getcwd(), "data", "all_data")
+    root_dir = join(getcwd(), "48x16data", "all_data")
     all_dir = join(root_dir, "train")
     gt_dir = join(root_dir, "label")
     test_dir = join(root_dir, "test_data")
@@ -62,7 +62,7 @@ def train_test_split(train_ratio=0.8):
     return (train_data, gt_train), (test_data, gt_test)
 
 def get_training_set():
-    root_dir = join(getcwd(), "data", "all_data")
+    root_dir = join(getcwd(), "48x16data", "all_data")
     train_dir = join(root_dir, "train")
     if torch.cuda.is_available():
         print("get_training_set: Cuda is available")
@@ -77,7 +77,7 @@ def get_training_set():
 
 
 def get_validation_set():
-    root_dir = join(getcwd(), "data", "all_data")
+    root_dir = join(getcwd(), "48x16data", "all_data")
     validation_dir = join(root_dir, "validation")
     if torch.cuda.is_available():
         print("get_validation_set: Cuda is available")
@@ -90,7 +90,7 @@ def get_validation_set():
                              target_transform=target_transform())
 
 def get_test_set():
-    root_dir = join(getcwd(), "data", "all_data")
+    root_dir = join(getcwd(), "48x16data", "all_data")
     test_dir = join(root_dir, "test")
     if torch.cuda.is_available():
         print("get_test_set: Cuda is available")

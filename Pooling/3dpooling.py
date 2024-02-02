@@ -82,7 +82,7 @@ def batch_pool(input_dir, output_dir, method, pool_size=(3,3,3), loading_bar=Tru
             end = start + pool_size[slice_axis]
             # Ask Marko about this
             np.save(f"{output_dir}/data/{x[:-3]}{j}.npy", pooled_array.take(j, slice_axis))
-            np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
+            #np.save(f"{output_dir}/labels/{x[:-3]}{j}.npy", np.take(input_array, np.arange(start,end), slice_axis))
         if loading_bar:
             progress_bar(i+1, len(file_list_h5))
 
@@ -103,12 +103,12 @@ fChannel_Pooled = os.path.join(data_dir, "2000_Full_Channel_Pooled")
 
 #inputDir = os.path.join(data_dir, "../dataSent")
 inputDir = os.path.join(work_dir, "../../channelData")
-outputDir = os.path.join(work_dir, "../model/data/all_data/train")
+outputDir = os.path.join(work_dir, "../model/48x16data/all_data/train")
 Path(os.path.join(outputDir, "data")).mkdir(parents=True, exist_ok=True)
 Path(os.path.join(outputDir, "labels")).mkdir(parents=True, exist_ok=True)
 
 # batch_pool(input_dir=fChannel, output_dir=fChannel_Pooled, method=np.mean, pool_size=(31,31,3))
-batch_pool(input_dir=inputDir, output_dir=outputDir, method=np.mean, pool_size=(31,31,3), slice_axis=2)
+batch_pool(input_dir=inputDir, output_dir=outputDir, method=np.mean, pool_size=(32,32,3), slice_axis=2)
 # batch_pool(input_dir=cData, output_dir=cData_Pooled, method=np.mean, pool_size=(31,31,3))
 
 #-------------------------------------------------#
