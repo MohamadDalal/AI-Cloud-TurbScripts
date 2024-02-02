@@ -93,6 +93,8 @@ min_Val = np.min(np.sum(input[0].numpy()**2, axis=0))
 print(min_Val, max_Val)
 colorbarTicks = np.linspace(min_Val, max_Val, 10, endpoint=True)
 
+plt.style.use('dark_background')
+
 fig, axes = plt.subplots(1,3, figsize=(10,5))
 pcm = axes[0].imshow(np.sum(input[0].numpy()**2, axis=0), vmin=min_Val, vmax=max_Val)
 axes[0].axis("off")
@@ -107,7 +109,7 @@ axes[1].axis("off")
 axes[1].set_title("Bicubic interpolation")
 print(pcm)
 fig.colorbar(pcm, ax=axes[:], shrink=0.7)
-fig.savefig("FinalReportFigures/Figure_DSCMS_Real_RANS/DSCMS_Real_RANS.png", dpi=800, bbox_inches='tight')
+fig.savefig("FinalReportFigures/Figure_DSCMS_Real_RANS/DSCMS_Real_RANS_DarkTransparent.png", dpi=800, bbox_inches='tight', transparent=True)
 
 Fig, ax = plt.subplots()
 ax.imshow(np.sum(input[0].numpy()**2, axis=0), vmin=min_Val, vmax=max_Val)

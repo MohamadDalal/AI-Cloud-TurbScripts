@@ -47,7 +47,7 @@ def get_test_set():
 
 
 def test(model, channel):
-    TEST_Path = join(SAVE_PATH, "DSCMS-B128-E120-L0001-MSELoss-LastData_WithPredictions", f"Channel{testChannel}", "Test_Res")
+    TEST_Path = join(SAVE_PATH, "DSCMS-B128-E30-L0001-MSELoss-LastData_WithPredictions", f"Channel{testChannel}", "Test_Res")
     Path(TEST_Path).mkdir(parents=True, exist_ok=True)
     avg_psnr = 0
     psnr_list = []
@@ -63,7 +63,7 @@ def test(model, channel):
             input, target = batch[0].to(device), batch[1].to(device)
             #print(input.shape, target.shape)
             prediction = model(input)
-            #np.save(f"{TEST_Path}/{test_set.image_filenames[index][:-4]}_Prediction.npy", torch.permute(prediction[0], (1,2,0)).numpy())
+            np.save(f"{TEST_Path}/{test_set.image_filenames[index][:-4]}_Prediction.npy", torch.permute(prediction[0], (1,2,0)).numpy())
             #print(target.shape)
             #print(prediction.shape)
             mse = criterion_mse(prediction[:,channel,...], target[:,channel,...])
@@ -101,8 +101,8 @@ def log_seperate_epoch(metrics, metric_names, logging_path):
 
 BATCH_SIZE = 1
 #CHECKPOINT_PATH = "../Logs_from_the_cloud/Friday-24-11-2023/model_checkpoints/model_epoch_30.pth"
-CHECKPOINT_PATH = "../Logs_from_the_cloud/Wednesday-06-12-2023/model_checkpoints/model_epoch_120.pth"
-SAVE_PATH = "test_logs/FinalReportTests/FixedPSNR/"
+CHECKPOINT_PATH = "../Logs_from_the_cloud/Wednesday-06-12-2023/model_checkpoints/model_epoch_30.pth"
+SAVE_PATH = "test_logs/PresentationTests/"
 
 
 if torch.cuda.is_available():
@@ -124,7 +124,7 @@ loss_names = ("MSE", "PSNR", "MAE", "DIV")
 model1.load_state_dict(checkpoint_dict["model_state_dict"])
 print(len(testing_data_loader))
 model1_start = perf_counter()
-testChannel = 2
+testChannel = (0,1,2)
 #test_mse1, test_avg_mse1, test_iter_mse1, test_psnr1, test_avg_psnr1, test_iter_psnr1 = test(model1, criterion_mse)
 full_loss1, avg_loss1, list_loss1 = test(model1, testChannel)
 model1_end = perf_counter()
@@ -132,7 +132,7 @@ print(f"Time taken for model 1 = {model1_end-model1_start}")
 
 #M1_Path = join(SAVE_PATH, "NewModel-B128-E120-L0001-MSELoss-LastData", f"Channel{testChannel}")
 #M1_Path = join(SAVE_PATH, "DSCMS-B128-E120-L0001-MSELoss-LastData_AddedMinInPSNR", f"Channel{testChannel}")
-M1_Path = join(SAVE_PATH, "OldModel-B128-E120-L0001-MSELoss-LastData", f"Channel{testChannel}")
+M1_Path = join(SAVE_PATH, "OldModel-B128-E30-L0001-MSELoss-LastData", f"Channel{testChannel}")
 Path(M1_Path).mkdir(parents=True, exist_ok=True)
 #log_seperate_epoch(test_iter_mse1, test_iter_psnr1, M1_Path)
 log_seperate_epoch(list_loss1, loss_names, M1_Path)

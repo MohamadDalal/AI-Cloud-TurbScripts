@@ -42,21 +42,22 @@ img_to_tensor = Compose([
             ToTensor(),
             #GaussianBlur(9, 1),
             #Resize((1536,512), InterpolationMode=InterpolationMode.BICUBIC, antialias=False),
+            Resize((192, 64), antialias=False)
         ])
 device = torch.device("cpu")
 
 root_dir = join(getcwd(), "49x18data", "all_data")
 test_dir = join(root_dir, "test", "data")
-predictions_dir = join(getcwd(), "test_logs/FinalReportTests/DSCMS-B128-E120-L0001-MSELoss-LastData_WithPredictions/Channel(0, 1, 2)/Test_Res")
-out_dir = join(getcwd(), "FinalReportFigures/MAE_Diff")
+predictions_dir = join(getcwd(), "test_logs/PresentationTests/DSCMS-B128-E30-L0001-MSELoss-LastData_WithPredictions/Channel(0, 1, 2)/Test_Res")
+out_dir = join(getcwd(), "FinalReportFigures/MAE_Diff30")
 image_filenames = [x for x in sorted(listdir(test_dir)) if is_array_file(x)]
 print(len(image_filenames))
 MAE_Sum = np.zeros((1536,512,3), np.float32)
 for i, x in enumerate(image_filenames):
     print(i)
-    if i < 513:
-        MAE_Arr = np.load(f"{out_dir}/SingleDiff/{x[:-4]}.npy")
-        MAE_Sum += MAE_Arr
+    #if i < 513:
+    #    MAE_Arr = np.load(f"{out_dir}/SingleDiff/{x[:-4]}.npy")
+    #    MAE_Sum += MAE_Arr
     input = img_to_tensor(np.load(f"{test_dir}/{x}")).to(device)
     input.unsqueeze_(0)
     Test = interpolate(input, size=(1536, 512), mode="bicubic")
